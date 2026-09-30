@@ -27,13 +27,14 @@ import re
 import sys
 
 _UNIT = re.compile(r'^#*\s*单元\s*(\d+)')
+_CLIP_LEGACY = re.compile(r'^#{2,4}\s*Clip\s*0*\d+', re.IGNORECASE)
 _SHOT = re.compile(r'^#*\s*镜头\s*(\d+)\s*[|｜]\s*(.*)$')
 _CAST = re.compile(r'出场人物\s*[：:]\s*(.+)')
 _SAME = re.compile(r'同人声明\s*[：:]\s*(.+)')
 _ANCHOR_INLINE = re.compile(r'锚点\s*[：:]\s*([^）)]+)')
 _ANCHOR_NAMED = re.compile(r'([\u4e00-\u9fa5A-Za-z0-9]{2,10})锚点')
 _UNIT_PEOPLE = re.compile(r'^人物\s*[：:]\s*(.+)')
-_ROLE = re.compile(r'@([^\s@、，,｜|（(]+)')
+_ROLE = re.compile(r'@([^\s@、，,｜|（(<]+)')
 _OTS = re.compile(r'越肩')
 _SAME_OK = re.compile(r'同一个人|同一个|只出现一次|不是第二个人|同一位')
 _VAGUE = re.compile(r'左边|右边|旁边|对面')
@@ -53,14 +54,20 @@ def roles_of(seg):
 
 
 def parse(text):
+    """返回 (units, has_unit, has_clip)。has_unit/has_clip 用于 FMT-01 格式守卫。"""
     lines = text.splitlines()
     units, cur = [], None
+    has_unit = False
+    has_clip = False
     for i, raw in enumerate(lines):
+        if _CLIP_LEGACY.match(raw):
+            has_clip = True
         m = _UNIT.match(raw)
         if m:
             cur = {'no': int(m.group(1)), 'lineno': i + 1, 'people': [],
                    'anchors': set(), 'shots': []}
             units.append(cur)
+            has_unit = True
             continue
         if cur is None:
             cur = {'no': 1, 'lineno': 1, 'people': [], 'anchors': set(), 'shots': []}
@@ -92,11 +99,23 @@ def parse(text):
             ms = _SAME.search(raw)
             if ms:
                 sh['same'] = ms.group(1).strip()
-    return units
+    return units, has_unit, has_clip
 
 
-def check(units):
+def check(units, has_unit=True, has_clip=False):
     blockers, warnings, info = [], [], []
+
+    # FMT-01 格式守卫：不认识就报错，不要静默通过
+    if not has_unit:
+        if has_clip:
+            blockers.append({'id': 'FMT-01',
+                             'msg': '交付物是**旧格式**（`### Clip NN`），本检查器只认'
+                                    '「单元 N + 镜头 N |」——请按新格式重写'})
+        else:
+            blockers.append({'id': 'FMT-01',
+                             'msg': '交付物里既没有「单元 N」也没有「### Clip NN」——'
+                                    '**格式不认识，请人工确认**。不要因为脚本没报警就当作通过'})
+
     if not units:
         warnings.append({'id': 'CNT-05', 'msg': '没有解析到「单元 N」结构'})
 
@@ -123,11 +142,14 @@ def check(units):
                         blockers.append({'id': 'CNT-06',
                                          'msg': f'{tag} 镜头 {sh["n"]:02d} 出现「人物：」行里没有的角色：{extra}'})
 
-            # 锚点名登记
-            for nm in _ANCHOR_NAMED.findall(body):
-                if u['anchors'] and nm not in u['anchors']:
+            # 锚点名登记：允许贪婪匹配把相邻词带进来——只要已知锚点名是它的后缀即可
+            if u['anchors']:
+                for nm in _ANCHOR_NAMED.findall(body):
+                    if nm in u['anchors'] or any(nm.endswith(a) for a in u['anchors']):
+                        continue
                     blockers.append({'id': 'CNT-07',
-                                     'msg': f'{tag} 镜头 {sh["n"]:02d} 用到锚点「{nm}」，但它不在本单元的锚点集合里'})
+                                     'msg': f'{tag} 镜头 {sh["n"]:02d} 用到锚点「{nm}」，'
+                                            f'但它不在本单元的锚点集合里（已登记：{sorted(u["anchors"])}）'})
 
             # 越肩镜必有同人声明
             if _OTS.search(sh['head']) or _OTS.search(body):
@@ -169,7 +191,7 @@ def main():
         print(f'读取失败: {e}', file=sys.stderr)
         return 2
 
-    r = check(parse(txt))
+    r = check(*parse(txt))
     if a.json:
         print(json.dumps(r, ensure_ascii=False, indent=2))
     else:

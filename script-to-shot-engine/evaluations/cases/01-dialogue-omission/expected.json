@@ -1,6 +1,7 @@
 {
   "case": "01-dialogue-omission",
-  "what": "合成夹具：故意制造 4 类已知缺陷，验证门禁真的咬人（test_guards_bite）",
+  "what": "合成夹具：故意制造 4 类已知缺陷，验证门禁真的咬人（test_guards_bite）。本案例刻意保留**旧格式**（`### Clip NN` + `分镜N（起-止秒）`），用来固定 check_dialogue／check_timeline 的行为。",
+  "format": "clip",
   "planted_defects": [
     "沈志远第二句「您得给我做我最爱吃的红烧肉！」整句缺失",
     "苏晓雯台词只写到逗号，后半句「我们吓得赶紧请假回来的。」未接续",
@@ -13,5 +14,7 @@
     "check_dialogue.py": ["DIA-01", "DIA-03", "DIA-04", "DIA-05"],
     "check_timeline.py": ["TIM-02"]
   },
-  "not_yet_implemented": ["AST-01", "AST-02", "FMT-01", "PRJ-01"]
+  "skip_checkers": ["check_cast.py", "check_units.py"],
+  "skip_reason": "本案例是旧格式夹具。新格式检查器对旧格式会报 FMT-01（由 cases/03 专门演示），不重复计入本案例预期。",
+  "not_yet_implemented": ["AST-01", "PRJ-01"]
 }

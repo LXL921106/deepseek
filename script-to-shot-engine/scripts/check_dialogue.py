@@ -96,13 +96,18 @@ def extract_delivery(text, names):
             continue
         for m in _QUOTE.finditer(raw):
             pre = raw[:m.start()]
-            who, at = None, False
+            # 新格式是「{说话人}看向{对象}：「台词」」——引号前最近的人名是**对象**，不是说话人。
+            # 所以先截到「看向」之前，再在那一截里找最近的人名。
+            seg = pre
+            k = pre.rfind('看向')
+            if k >= 0:
+                seg = pre[:k]
+            who, best_idx, at = None, -1, False
             for nm in names:
-                idx = pre.rfind(nm)
-                if idx >= 0:
-                    who = nm
-                    at = idx > 0 and pre[idx - 1] == '@'
-                    break
+                idx = seg.rfind(nm)
+                if idx > best_idx:
+                    best_idx, who = idx, nm
+                    at = idx > 0 and seg[idx - 1] == '@'
             out.append({'lineno': i + 1, 'clip': clip_index_at(lines, i),
                         'who': who, 'text': m.group(1), 'at': at,
                         'vo': '画外音' in pre[-10:]})

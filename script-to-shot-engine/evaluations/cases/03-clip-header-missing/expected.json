@@ -1,21 +1,20 @@
 {
   "case": "03-clip-header-missing",
-  "what": "真实输入（v14）·**旧格式**（`### Clip NN` + `分镜N（起-止秒）`）：分镜只覆盖 0—9 秒而 Clip 是 15 秒，多出来的 6 秒变成无声空白",
+  "what": "真实输入（v14）·**旧格式**：分镜只覆盖 0—9 秒而 Clip 是 15 秒，多出来的 6 秒变成无声空白。**本案例同时演示 FMT-01 格式守卫。**",
   "source": "实测 v14.mp4：语音 5.349—6.502s；静音 6.502—15.072s（8.57 秒无声）。成片里出现了两个苏晓雯。",
+  "format": "clip",
   "planted_defects": [
-    "没有 `### Clip NN` 标题（旧版 check_timeline 因此一个分镜都读不到，静默放行）",
     "分镜只覆盖 0—9 秒，而 Clip 是 15 秒，缺 6 秒",
-    "空间站位用相对方位散文（「妈妈坐在两人中间」与分镜「两人都看着画面左侧的她」互相矛盾）",
-    "越肩镜没有「同人声明」"
+    "用的是旧格式，本渲染器已换主干为「单元 N + 镜头 N |」"
   ],
-  "skip_checkers": ["check_cast.py", "check_units.py"],
+  "skip_checkers": ["check_cast.py"],
   "clip_seconds": 15,
-  "skip_reason": "这份交付是**旧格式**（本渲染器换主干之前的产物）。check_cast／check_units 只认新的「单元 N + 镜头 N |」格式，读不到它的镜头，因此本案例不适用——它的缺陷类由 check_timeline 的 TIM-04 覆盖。",
   "must_fire": {
     "check_dialogue.py": [],
-    "check_timeline.py": ["TIM-04"]
+    "check_timeline.py": ["TIM-04"],
+    "check_units.py": ["FMT-01"]
   },
   "must_not_fire": ["DIA-01", "DIA-02", "DIA-03", "DIA-04", "DIA-05", "AST-02", "TIM-01", "TIM-02", "TIM-03"],
-  "why_this_case_exists": "合成夹具里每一份都带 `### Clip NN` 标题——真实交付没有，第一个真实输入就撞出了门禁的假阴性。",
-  "todo": "把本案例迁移到新的「单元 N + 镜头 N |」格式，并在 check_units.py 里加一条**格式守卫**（交付物既没有 `单元 N` 也没有 `### Clip NN` 时报错，而不是静默放行）。"
+  "why_this_case_exists": "两个理由：① 合成夹具里每一份都带 `### Clip NN` 标题——真实交付没有，第一个真实输入就撞出了 check_timeline 的假阴性；② **它是 FMT-01 格式守卫的验收案例**——旧格式必须被明确报错，而不是被 check_units 静默跳过。",
+  "todo": "若决定不再保留旧格式支持，本案例可改写成新格式；在那之前它固定住「不认识就报错」这条行为。"
 }

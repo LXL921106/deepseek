@@ -57,6 +57,8 @@
 | `CNT-02` | 跨 Clip 承接上一段末态 |
 | `CNT-07` | 走位只改顺序不改人数；人物走动写在发生它的那个分镜里 |
 | `TAS-01` | 内容—时长匹配：分镜时长显著大于「台词＋动作所需」时，必须在镜内写明理由（凝滞／等待／压迫感） |
+| `AFX-01` | 画面描述里不得写心理感受（"她感到悲伤""他很感动"）——必须写成看得见的身体/脸（脚本**只提示**，词表不得阻断） |
+| `AFX-02` | 不得用无参照方位词（"左边/右边/旁边/对面"）——必须写"锚点名＋画左/画中/画右"（脚本**只提示**，词表不得阻断） |
 
 ## craft_default（创作者说明理由即可覆盖）
 
@@ -131,11 +133,17 @@
 
 ## 脚本
 
-| 脚本 | 覆盖 | 用法 |
-|---|---|---|
-| `scripts/check_dialogue.py` | `DIA-01`–`DIA-05` | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
-| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
-| `scripts/check_cast.py` | `CNT-05`–`CNT-07` | `python check_cast.py --delivery 交付物.md` |
+| 脚本 | 覆盖 | 线路 | 用法 |
+|---|---|---|---|
+| `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01` | **Wan 新格式（本线）** | `python check_units.py --delivery 交付物.md` |
+| `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01` | **Wan 新格式（本线）** | `python check_cast.py --delivery 交付物.md` |
+| `scripts/check_dialogue.py` | `DIA-01`–`DIA-05`、`AST-02` | **两条线通用** | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
+| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | **仅旧格式／Seedance 线** | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
+
+**`FMT-01` 格式守卫**：`check_units.py` 与 `check_cast.py` 发现交付物既不是「单元 N」也不是「### Clip NN」时**直接报错**，不静默通过。
+> 教训：`check_timeline.py` 曾因找不到 `### Clip NN` 而一个分镜都没读到，把一份漏了 6 秒的提示词判成"通过"。**"读不到内容"必须和"内容没问题"区分开。**
+
+**`check_timeline.py` 已不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担。保留它只为旧格式交付与 Seedance 路径。
 
 DSH 环境用捆绑 Python：`~/.dsh/dsh-runtimes/*/dependencies/python/python.exe`。
 

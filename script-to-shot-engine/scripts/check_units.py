@@ -26,6 +26,7 @@ import re
 import sys
 
 _UNIT = re.compile(r'^#*\s*单元\s*(\d+)')
+_CLIP_LEGACY = re.compile(r'^#{2,4}\s*Clip\s*0*\d+', re.IGNORECASE)
 _TOTAL_DECL = re.compile(r'共\s*(\d+)\s*镜共\s*([\d.]+)\s*秒')
 _SUM_DECL = re.compile(r'总计[：:]\s*([\d.]+)\s*秒')
 _SHOT = re.compile(r'^#*\s*镜头\s*(\d+)\s*[|｜]')
@@ -46,14 +47,20 @@ def ceil_half(x):
 
 
 def parse(text):
+    """返回 (units, has_unit, has_clip)。has_unit/has_clip 用于 FMT-01 格式守卫。"""
     lines = text.splitlines()
     units, cur = [], None
+    has_unit = False
+    has_clip = False
     for i, raw in enumerate(lines):
+        if _CLIP_LEGACY.match(raw):
+            has_clip = True
         m = _UNIT.match(raw)
         if m:
             cur = {'no': int(m.group(1)), 'lineno': i + 1, 'decl_shots': None,
                    'decl_total': None, 'sum_total': None, 'shots': []}
             units.append(cur)
+            has_unit = True
             continue
         if cur is None:
             cur = {'no': 1, 'lineno': 1, 'decl_shots': None, 'decl_total': None,
@@ -103,11 +110,26 @@ def parse(text):
             act = _ACTION.search(sh['raw'])
             if act:
                 sh['action'] = float(act.group(1))
-    return units
+    return units, has_unit, has_clip
 
 
-def check(units):
+def check(units, has_unit=True, has_clip=False):
     blockers, warnings, info = [], [], []
+
+    # FMT-01 格式守卫：不认识就报错，不要静默通过
+    # （实测教训：check_timeline 曾因找不到 `### Clip NN` 而一个分镜都没读到，把漏了 6 秒的提示词判成通过）
+    if not has_unit:
+        if has_clip:
+            blockers.append({'id': 'FMT-01',
+                             'msg': '交付物是**旧格式**（`### Clip NN`）。本渲染器已换主干为'
+                                    '「单元 N + 镜头 N | + 时长计算」——请按新格式重写；'
+                                    '若确实要走 Seedance／旧流程，请用 check_timeline.py'})
+        else:
+            blockers.append({'id': 'FMT-01',
+                             'msg': '交付物里既没有「单元 N」也没有「### Clip NN」——'
+                                    '**格式不认识，请人工确认**。不要因为脚本没报警就当作通过：'
+                                    '它只是没读到内容'})
+
     if not units:
         warnings.append({'id': 'TIM-01', 'msg': '没有解析到「单元 N」结构'})
 
@@ -186,7 +208,7 @@ def main():
         print(f'读取失败: {e}', file=sys.stderr)
         return 2
 
-    r = check(parse(txt))
+    r = check(*parse(txt))
     if a.json:
         print(json.dumps(r, ensure_ascii=False, indent=2))
     else:
