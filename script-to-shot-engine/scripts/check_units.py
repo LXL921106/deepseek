@@ -123,7 +123,7 @@ def check(units, has_unit=True, has_clip=False):
             blockers.append({'id': 'FMT-01',
                              'msg': '交付物是**旧格式**（`### Clip NN`）。本渲染器已换主干为'
                                     '「单元 N + 镜头 N | + 时长计算」——请按新格式重写；'
-                                    '若确实要走 Seedance／旧流程，请用 check_timeline.py'})
+                                    '若确实要审历史旧格式交付，请用 check_timeline.py'})
         else:
             blockers.append({'id': 'FMT-01',
                              'msg': '交付物里既没有「单元 N」也没有「### Clip NN」——'

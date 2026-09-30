@@ -139,12 +139,12 @@
 | `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01` | **Wan 新格式（本线）** | `python check_units.py --delivery 交付物.md` |
 | `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01` | **Wan 新格式（本线）** | `python check_cast.py --delivery 交付物.md` |
 | `scripts/check_dialogue.py` | `DIA-01`–`DIA-05`、`AST-02` | **两条线通用** | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
-| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | **仅旧格式／Seedance 线** | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
+| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | **仅历史旧格式交付** | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
 
 **`FMT-01` 格式守卫**：`check_units.py` 与 `check_cast.py` 发现交付物既不是「单元 N」也不是「### Clip NN」时**直接报错**，不静默通过。
 > 教训：`check_timeline.py` 曾因找不到 `### Clip NN` 而一个分镜都没读到，把一份漏了 6 秒的提示词判成"通过"。**"读不到内容"必须和"内容没问题"区分开。**
 
-**`check_timeline.py` 已不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担。保留它只为旧格式交付与 Seedance 路径。
+**`check_timeline.py` 已不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担。保留它只为**历史旧格式交付**（老产物仍然要能审）。
 
 DSH 环境用捆绑 Python：`~/.dsh/dsh-runtimes/*/dependencies/python/python.exe`。
 

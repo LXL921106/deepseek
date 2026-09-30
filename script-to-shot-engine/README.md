@@ -4,10 +4,9 @@
 
 **English | [中文](README.zh-CN.md)**
 
-**Turn scripts into shot-by-shot video prompts, ready to feed Seedance 2.x or Wan 3.0**
+**Turn scripts into shot-by-shot video prompts, ready to feed Wan 3.0 (通义万相 3.0)**
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue)
-![Model](https://img.shields.io/badge/Seedance-2.x-orange)
+![Version](https://img.shields.io/badge/version-4.0.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -29,7 +28,7 @@ A Skill that reads your **existing art assets** (characters / scenes / weapons /
 货柜木板特写（close-up detail）固定拍摄（static shot）；球棍"砰"地砸进木板，木屑飞溅。
 ```
 
-Prompts are generated in Chinese by design — Seedance handles them best that way. Every aperture value carries a Chinese depth-of-field note, every focal length carries a shot-size note, and cinematography terms are bilingual: Chinese first, English in parentheses on first use in each clip.
+Prompts are generated in Chinese by design — Wan 3.0 handles them best that way. Every aperture value carries a Chinese depth-of-field note, every shot carries a **shot size** (never a focal length), and cinematography terms are bilingual: Chinese first, English in parentheses on first use in each unit.
 
 ## 🎯 Two scene modes
 
@@ -112,5 +111,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v3.0.0</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
+Current version <b>v4.0.0</b> · Wan 3.0 only — one renderer, one set of rules
 </div>

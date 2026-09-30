@@ -1,9 +1,9 @@
 ---
 name: script-to-shot-engine
-description: 基于用户已有的人物、场景、武器与道具美术资产，把打戏、动作场面或对白驱动的对峙文戏（剧本、分场、桥段）设计为动作与张力因果链，并生成简洁、去重、可直接投喂 Seedance 等视频模型的单段或连续多 Clip 提示词。适用于真人、武侠、冷兵器、枪战、玄幻、2D 动画或 3D Boss 战的打斗与追逐，也适用于多人谈判、审问、摊牌、决裂等以台词、视线和微动作推进的室内对峙场景；支持一镜到底、长篇拆段、提高动作可读性、打击感与资产连续性。不用于生成美术资产、分镜宫格或自动评价成片。
+description: 基于用户已有的人物、场景、武器与道具美术资产，把打戏、动作场面或对白驱动的对峙文戏（剧本、分场、桥段）设计为动作与张力因果链，并生成简洁、去重、可直接投喂通义万相 Wan 3.0 等视频模型的单段或连续多单元提示词。适用于真人、武侠、冷兵器、枪战、玄幻、2D 动画或 3D Boss 战的打斗与追逐，也适用于多人谈判、审问、摊牌、决裂等以台词、视线和微动作推进的室内对峙场景；支持一镜到底、长篇拆段、提高动作可读性、打击感与资产连续性。不用于生成美术资产、分镜宫格或自动评价成片。
 ---
 
-# Script-to-Shot Engine v3.0.0
+# Script-to-Shot Engine v4.0.0
 
 ## 目标
 
@@ -42,7 +42,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ## 默认值与项目档案
 
-- 目标模型：用户指定；缺失用 Seedance 2.x 通用写法；为 **Wan 3.0** 时全程走 [references/wan-renderer.md](references/wan-renderer.md)。
+- 目标模型：**Wan 3.0（通义万相 3.0）**。全程按 [references/wan-renderer.md](references/wan-renderer.md) 执行。用户点了别的模型名时仍按 Wan 口径写，并在生成前提醒里说明差异（本项目只用 Wan，不维护第二套渲染器）。
 - 单次最长时长：用户指定，缺失 15 秒。画幅：用户指定，缺失 16:9。媒介：沿用资产描述，缺失真人写实。
 - 全局风格：由用户风格＋资产库＋题材推导为六槽位锁定词；与资产库冲突时询问，不自动覆盖。
 - 输出语言：中文；视听术语按「中文（English）」，同一 Clip 内同术语只在首次附英文。
@@ -111,7 +111,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ### 6. 渲染、去重、输出
 
-读渲染器（Wan 3.0 → [references/wan-renderer.md](references/wan-renderer.md)；其余 → [references/seedance-prompt-renderer.md](references/seedance-prompt-renderer.md)），由渲染器决定正文结构与输出格式。
+读渲染器 [references/wan-renderer.md](references/wan-renderer.md)，由它决定正文结构与输出格式。
 
 压缩顺序：① 删镜内重复摄影参数（保留各镜自己的景别与光圈）② 删镜内重复的风格与光线描述 ③ 合并同义否定约束 ④ 删没造成结果的次要敌人动作 ⑤ 合并不改变战局的动作阶段 ⑥ 删装饰性粒子、衣摆与灰尘。
 
@@ -156,28 +156,20 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 |---|---|---|---|---|
 | SC001 · 第12句 | 苏晓雯 | 妈，您在电话里说有事要跟我们说，我们吓得赶紧请假回来的。 | Clip 02 镜头4 → Clip 03 镜头1（跨 Clip 接续） | ✅ |
 
-## 视频生成提示词
+## 单元 N
 
-### Clip 01｜时长
+正文按 [references/wan-renderer.md](references/wan-renderer.md) §9「单镜头模板」与 §10「输出」写：
 
 ```text
-风格锁定：{媒介来源}，{渲染方式}，{角色质感}，{运动质感}，{材质语言}，{光影色彩}。
-特殊风格化：不启用。本 Clip 保持普通风格锁定。
-
-资产确认：人物——@角色名[参考图标签]（状态变化写括号）；声音——{本 Clip 声音构成}；场景——@场景名[参考图标签]；道具——@道具名[参考图标签]（状态变化写括号）。
-全局角色声线绑定：@角色名——{音色特征}{青年/中年/老年}{男/女}音。
-皮肤质感：完全保留皮肤纹理的自然质感与瑕疵，无磨皮。
-
-空间锚点：锚点清单（名称·位置描述·视觉特征）+ 人物初始位置（位置·面朝·相对锚点关系）。
-
-镜头一（0-1.2秒）：光圈 f/2.8（浅景深，背景明显虚化），景别 近景，景别、机位或运镜（专业术语附英文），动作与结果。
-镜头二（1.2-2.4秒）：光圈 f/2.8（浅景深，背景明显虚化），景别 特写，景别、机位或运镜，动作与结果。
-……中间镜头继续从不同观看重点覆盖，并保持时间首尾相接。
-镜头十（13.4-15秒）：光圈 f/4（中等景深，背景轻微虚化），景别 全景，交代本段最后的动作结果。
-
-结尾状态：人物、武器与空间结果。
-约束：集中失败规避与声音要求。
+单元 N → 摄影机头 → 一句话场景 → 共N镜共X秒 → 人物/场景/道具 → 统一强制约束
+      → 光线 → 空间调度 → 色调 → 承接上一单元
+      → 逐镜头（每个镜头：时长计算 / 场景与锚点 / 出场人物 / 道具 / 空间坐标 / 同人声明 /
+                 画面描述 / 光影 / 色调 / 运镜 / 构图 / 声画同步 / 台词 / 台词字数 /
+                 人声 / 音效 / 人物情绪 / 本镜禁止 / 强制约束）
+      → 物理 → SFX → 禁止 → 总计X秒/N镜/9:16
 ```
+
+**不再使用 `### Clip NN` + 逐镜时间戳的旧写法**——时长由每镜的「时长计算」逐镜算出后求和，**总和即单元时长**，并按这个值设平台时长。
 
 ## 生成前提醒
 
@@ -218,7 +210,7 @@ python scripts/check_cast.py      --delivery 交付物.md      # 出场人物 ·
 **`FMT-01` 格式守卫**：交付物既不是「单元 N」也不是「### Clip NN」时，脚本**直接报错**，不静默通过。
 > 教训：`check_timeline.py` 曾因找不到 `### Clip NN` 而一个分镜都没读到，把一份漏了 6 秒的提示词判成"通过"。**"读不到内容"必须和"内容没问题"区分开。**
 
-**`check_timeline.py` 不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担；它只为旧格式交付与 Seedance 路径保留。
+**`check_timeline.py` 不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担；它只为**历史旧格式交付**保留。
 
 `--clip-seconds` 填这一段平台单次生成的秒数；**填了才查得出"末镜短于 Clip 时长"**（多出来的那段时间会变成无声空白）。
 
@@ -252,7 +244,7 @@ $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\pytho
 
 **这一层不该阻断交付。** 想覆盖就直接覆盖，写一句理由。
 
-**按所选渲染器核对**：Wan 3.0 另按 [references/wan-renderer.md](references/wan-renderer.md) 的门禁逐项核对；Seedance 按本清单。
+**门禁按 [references/wan-renderer.md](references/wan-renderer.md) §12 逐项核对。**
 
 ## 禁止事项
 
@@ -274,7 +266,6 @@ $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\pytho
 | [references/action-choreography-rules.md](references/action-choreography-rules.md) | 动作模式，只读相关类型 |
 | [references/dialogue-scene-mode.md](references/dialogue-scene-mode.md) | 对峙模式 |
 | [references/continuous-mode.md](references/continuous-mode.md) | 连续多段 |
-| [references/wan-renderer.md](references/wan-renderer.md) | 目标模型为 Wan 3.0 |
-| [references/seedance-prompt-renderer.md](references/seedance-prompt-renderer.md) | 其余模型 |
+| [references/wan-renderer.md](references/wan-renderer.md) | **目标模型 Wan 3.0 —— 主干，全程必读** |
 | [evaluations/README.md](evaluations/README.md) | 想知道"怎么证明改规则没有退步" |
 | [examples/](examples/) | **旧格式范例**（带逐镜时间戳与焦段）——只看结构，**写作口径一律以 wan-renderer.md 为准** |

@@ -174,14 +174,10 @@ _HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什�
 
 
 def sc07():
-    """过时措辞：新主干里不该再有这些。讲历史/讲教训的行除外。
-
-    注意：焦距检查只覆盖 wan-renderer.md——SKILL.md 的默认输出模板走的是 Seedance 线，
-    那条线是否也该去掉焦距尚无实测依据，留给人工决定。
-    """
+    """过时措辞：全技能不该再有这些。讲历史/讲教训的行除外。"""
     stale = {
         'anchor': (['SKILL.md', 'references/wan-renderer.md'], [r'空间站位']),
-        'focal': (['SKILL.md', 'references/wan-renderer.md', 'references/seedance-prompt-renderer.md',
+        'focal': (['SKILL.md', 'references/wan-renderer.md',
                    'references/dialogue-scene-mode.md', 'references/continuous-mode.md',
                    'references/action-choreography-rules.md'], [r'85mm', r'135mm', r'焦段']),
         'density': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md'],
