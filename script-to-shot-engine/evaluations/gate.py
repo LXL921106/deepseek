@@ -35,10 +35,12 @@ CHECKERS = {
 }
 
 
-def run_checker(script, case_dir, verbose):
+def run_checker(script, case_dir, verbose, exp=None):
     cmd = [sys.executable, os.path.join(SCRIPTS, script)]
     for tok in CHECKERS[script]:
         cmd.append(os.path.join(case_dir, tok) if tok.endswith('.md') else tok)
+    if script == 'check_timeline.py' and exp and exp.get('clip_seconds'):
+        cmd += ['--clip-seconds', str(exp['clip_seconds'])]
     cmd.append('--json')
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', timeout=60)
@@ -87,7 +89,7 @@ def main():
         for script in CHECKERS:
             must = set(exp.get('must_fire', {}).get(script, []))
             mustnot = set(exp.get('must_not_fire', []))
-            fired, err = run_checker(script, case_dir, a.verbose)
+            fired, err = run_checker(script, case_dir, a.verbose, exp)
             if err:
                 problems.append(f'{script}: {err}')
                 print(f'   ✗ {script}: {err}')

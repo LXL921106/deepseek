@@ -1,0 +1,16 @@
+{
+  "case": "03-clip-header-missing",
+  "what": "真实输入（v14）：提示词里没有 `### Clip NN` 标题，且末镜只到 9 秒而 Clip 是 15 秒——多出来的 6 秒变成无声空白",
+  "source": "实测 v14.mp4：语音 5.349—6.502s；静音 6.502—15.072s（8.57 秒无声）。提示词最后一个分镜结束在 9 秒。",
+  "clip_seconds": 15,
+  "planted_defects": [
+    "没有 `### Clip NN` 标题（旧版解析器因此一个分镜都读不到，静默放行）",
+    "分镜只覆盖 0—9 秒，而 Clip 是 15 秒，缺 6 秒"
+  ],
+  "must_fire": {
+    "check_dialogue.py": [],
+    "check_timeline.py": ["TIM-04"]
+  },
+  "must_not_fire": ["DIA-01", "DIA-02", "DIA-03", "DIA-04", "DIA-05", "AST-02", "TIM-01", "TIM-02", "TIM-03"],
+  "why_this_case_exists": "合成夹具里每一份都带 `### Clip NN` 标题，所以旧解析器永远读得到分镜——真实交付没有标题，门禁静默通过一个漏了 6 秒的提示词。"
+}

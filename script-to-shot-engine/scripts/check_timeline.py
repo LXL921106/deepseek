@@ -47,19 +47,22 @@ _SHOT_LOOSE = re.compile(r'^\s*(?:分镜|镜头)\s*([一二三四五六七八九
 _OVERLAP_OK = re.compile(r'有意重叠|音画分离|音频桥|重叠区间')
 
 
-def parse(text):
+def parse(text, declared=None):
     lines = text.splitlines()
     clips = []
     cur = None
     for i, raw in enumerate(lines):
         m = _CLIP.match(raw)
         if m:
-            cur = {'no': int(m.group(1)), 'declared': float(m.group(2)) if m.group(2) else None,
+            cur = {'no': int(m.group(1)), 'declared': float(m.group(2)) if m.group(2) else declared,
                    'lineno': i + 1, 'raw': raw.strip(), 'shots': []}
             clips.append(cur)
             continue
         if cur is None:
-            continue
+            # 真实交付里常常没有 `### Clip NN` 标题：整份文档当作一个 Clip
+            cur = {'no': 1, 'declared': declared, 'lineno': 1,
+                   'raw': '(无 Clip 标题，整份文档视为一个 Clip)', 'shots': []}
+            clips.append(cur)
         m = _SHOT_STRICT.match(raw)
         if m:
             n = cn2int(m.group(1))
@@ -107,7 +110,10 @@ def check(clips):
             if abs(good[-1]['end'] - c['declared']) > 1e-6:
                 blockers.append({'id': 'TIM-04', 'msg': f'{tag} 声明 {c["declared"]} 秒，末镜结束在 {good[-1]["end"]} 秒'})
         else:
-            info.append(f'{tag} 标题未声明总时长（如 `### Clip 01｜15秒`），TIM-04 未执行')
+            warnings.append({'id': 'TIM-04',
+                             'msg': f'{tag} 未声明总时长；分镜只覆盖 0—{good[-1]["end"]} 秒。'
+                                    f'用 `--clip-seconds N` 复核末镜是否对齐：'
+                                    f'**末镜短于 Clip 时长，多出来的那段时间会变成无声空白**'})
 
     return {'blockers': blockers, 'warnings': warnings, 'info': info,
             'fired': sorted({b['id'] for b in blockers}),
@@ -117,6 +123,8 @@ def check(clips):
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--delivery', required=True, help='交付物（提示词）文件')
+    ap.add_argument('--clip-seconds', type=float, default=None,
+                    help='这一段声明的总时长（秒）。提示词没有 `### Clip NN｜NN秒` 标题时必填，否则查不出"末镜短于 Clip 时长"')
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
     try:
@@ -125,7 +133,7 @@ def main():
         print(f'读取失败: {e}', file=sys.stderr)
         return 2
 
-    r = check(parse(txt))
+    r = check(parse(txt, a.clip_seconds))
     if a.json:
         print(json.dumps(r, ensure_ascii=False, indent=2))
     else:
