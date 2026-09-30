@@ -75,7 +75,7 @@ def extract_script(text):
 
 
 # ---------- 交付物台词（按已知人名定位，不靠动词） ----------
-_QUOTE = re.compile(r'[“"]([^”"]+)[”"]')
+_QUOTE = re.compile(r'[“"「『]([^”"」』]+)[”"」』]')
 
 
 def known_names(script, text):
@@ -91,6 +91,9 @@ def extract_delivery(text, names):
     lines = text.splitlines()
     out = []
     for i, raw in enumerate(lines):
+        # 承接上一单元那行会引用上一段的台词，它不是本单元的交付内容
+        if raw.strip().startswith('承接'):
+            continue
         for m in _QUOTE.finditer(raw):
             pre = raw[:m.start()]
             who, at = None, False

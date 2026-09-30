@@ -33,6 +33,7 @@ CHECKERS = {
     'check_dialogue.py': ['--script', 'script.md', '--delivery', 'delivery.md', '--ledger', 'ledger.md'],
     'check_timeline.py': ['--delivery', 'delivery.md'],
     'check_cast.py': ['--delivery', 'delivery.md'],
+    'check_units.py': ['--delivery', 'delivery.md'],
 }
 
 
@@ -88,6 +89,9 @@ def main():
         problems = []
         print(f'\n── {name} ── {exp.get("what","")}')
         for script in CHECKERS:
+            if script in (exp.get('skip_checkers') or []):
+                print(f'   ⊘ {script}  本案例不适用（skip_checkers）')
+                continue
             must = set(exp.get('must_fire', {}).get(script, []))
             mustnot = set(exp.get('must_not_fire', []))
             fired, err = run_checker(script, case_dir, a.verbose, exp)
