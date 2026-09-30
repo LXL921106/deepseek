@@ -53,7 +53,29 @@ cases/NN-名字/
 
 ## 尚未覆盖
 
-`AST-01`、`FMT-01`、`PRJ-01` 还没有校验器；`cases/*/expected.json` 的 `not_yet_implemented` 字段记录着当前缺口。
+`AST-01`、`PRJ-01` 还没有校验器——已在 `rule-tiers.md` 标注「待实现」，`selfcheck.py` 的 `SC-04` 会跳过它们而不是假装它们被阻断。
+
+## 技能自查
+
+```bash
+python selfcheck.py
+```
+
+门禁检查**交付物**；自查检查**技能自己**有没有互相矛盾：
+
+| ID | 查什么 |
+|---|---|
+| `SC-01` | 版本号四处一致（VERSION／SKILL.md 第6行／两个 README 的徽章与页脚） |
+| `SC-02` | markdown 相对链接没有死链 |
+| `SC-03` | 脚本 fire 的规则 ID 都在 `rule-tiers.md` 登记过 |
+| `SC-04` | 标为「脚本可阻断」的 ID 都有脚本在 fire（标「待实现」的不算） |
+| `SC-05` | `gate.py` 覆盖 `scripts/` 下所有 `check_*.py` |
+| `SC-06` | 每个夹具都有 `expected.json`，且 `must_fire` 的 ID 都已登记 |
+| `SC-07` | 新主干里没有过时措辞（空间站位／焦距／信息密度配额／旧镜头格式） |
+| `SC-08` | 文本文件无 BOM、无替换字符 |
+| `SC-09` | 本机安装版与源码逐文件一致 |
+
+**改完先跑 `selfcheck.py`（说法一致），再跑 `gate.py`（守卫还在咬）。**
 
 ## 每次改规则后
 

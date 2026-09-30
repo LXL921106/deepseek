@@ -71,11 +71,14 @@ Every rule is registered in [`references/rule-tiers.md`](references/rule-tiers.m
 Deterministic checks are **scripts, not prose**:
 
 ```bash
+python scripts/check_units.py     --delivery delivery.md      # duration math · clipping · unit format
 python scripts/check_dialogue.py --script script.md --delivery delivery.md --ledger ledger.md
-python scripts/check_timeline.py  --delivery delivery.md
+python scripts/check_cast.py      --delivery delivery.md      # on-screen cast · anchors · same-person declaration
 ```
 
-[`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. **Script red = do not deliver.**
+[`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. [`evaluations/selfcheck.py`](evaluations/selfcheck.py) audits the skill against itself. **Script red = do not deliver.**
+
+> `FMT-01` **format guard**: a delivery that is neither the `单元 N` format nor the legacy `### Clip NN` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
 
 Why: prose checklists cannot distinguish "I checked" from "I actually checked". A dropped half-line looks identical to a complete one.
 

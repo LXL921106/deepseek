@@ -1,0 +1,268 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""技能自查 —— 检查这套东西自己有没有互相矛盾。
+
+它不管内容写得好不好，只管**一致性**：
+
+  SC-01  版本号四处一致（VERSION / SKILL.md 第 6 行 / 两个 README 的徽章与页脚）
+  SC-02  markdown 相对链接没有死链
+  SC-03  脚本里 fire 的规则 ID 都在 rule-tiers.md 登记过
+  SC-04  rule-tiers.md 里标为「脚本可阻断」的 ID 都有脚本在 fire
+  SC-05  gate.py 覆盖 scripts/ 下所有 check_*.py
+  SC-06  每个夹具都有 expected.json，且其 must_fire 的 ID 都已登记
+  SC-07  没有过时措辞残留（「空间站位」「焦距/85mm」不该出现在新主干与 SKILL.md）
+  SC-08  编码无替换字符（U+FFFD）、无 BOM
+  SC-09  本机安装版与源码逐文件一致（安装版不存在时跳过）
+
+用法:
+  python selfcheck.py [--json]
+退出码: 0 = 全过；1 = 有不一致；2 = 环境错误
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+INSTALLED = os.path.join(os.path.expanduser('~'), '.dsh', 'skills', 'script-to-shot-engine')
+
+_U8 = 'utf-8'
+RESULT = []
+
+
+def rec(code, ok, msg):
+    RESULT.append({'id': code, 'ok': bool(ok), 'msg': msg})
+    return ok
+
+
+def read(p):
+    with open(p, encoding=_U8) as fh:
+        return fh.read()
+
+
+def md_files():
+    out = []
+    for base in (ROOT, os.path.join(ROOT, 'references'), os.path.join(ROOT, 'evaluations'),
+                 os.path.join(ROOT, 'templates')):
+        if not os.path.isdir(base):
+            continue
+        for dirpath, _d, files in os.walk(base):
+            if os.sep + '.git' in dirpath:
+                continue
+            for f in files:
+                if f.endswith('.md'):
+                    out.append(os.path.join(dirpath, f))
+    return out
+
+
+# ---- SC-01 版本一致 ----
+def sc01():
+    ver = read(os.path.join(ROOT, 'VERSION')).strip()
+    bad = []
+    skill_line = read(os.path.join(ROOT, 'SKILL.md')).splitlines()[5]
+    if ver not in skill_line:
+        bad.append(f'SKILL.md 第6行：「{skill_line}」')
+    for f in ('README.md', 'README.zh-CN.md'):
+        t = read(os.path.join(ROOT, f))
+        if f'version-{ver}-' not in t:
+            bad.append(f'{f} 徽章')
+        if f'v{ver}<' not in t:
+            bad.append(f'{f} 页脚')
+    return rec('SC-01', not bad, f'版本 {ver} 四处一致' if not bad else ' | '.join(bad))
+
+
+# ---- SC-02 死链 ----
+_LINK = re.compile(r'\]\(([^)#\s]+\.md)\)')
+
+
+def sc02():
+    bad = []
+    for p in md_files():
+        for target in _LINK.findall(read(p)):
+            if target.startswith(('http://', 'https://')):
+                continue
+            t = os.path.normpath(os.path.join(os.path.dirname(p), target))
+            if not os.path.isfile(t):
+                bad.append(f'{os.path.relpath(p, ROOT)} → {target}')
+    return rec('SC-02', not bad, f'{len(md_files())} 个 md，无死链' if not bad else ' | '.join(bad[:6]))
+
+
+# ---- ID 集合 ----
+def registered_ids():
+    t = read(os.path.join(ROOT, 'references', 'rule-tiers.md'))
+    return set(re.findall(r'`([A-Z]{2,4}-\d{2})`', t))
+
+
+def script_fired_ids():
+    got = {}
+    sd = os.path.join(ROOT, 'scripts')
+    for f in sorted(os.listdir(sd)):
+        if not f.startswith('check_') or not f.endswith('.py'):
+            continue
+        ids = set(re.findall(r"'id':\s*'([A-Z]{2,4}-\d{2})'", read(os.path.join(sd, f))))
+        ids |= set(re.findall(r'\{"id":\s*"([A-Z]{2,4}-\d{2})"', read(os.path.join(sd, f))))
+        got[f] = ids
+    return got
+
+
+def sc03():
+    reg = registered_ids()
+    fired = set()
+    for v in script_fired_ids().values():
+        fired |= v
+    unreg = sorted(fired - reg)
+    return rec('SC-03', not unreg,
+               f'脚本 fire 的 {len(fired)} 个 ID 全部已登记' if not unreg
+               else f'未登记的 ID：{unreg}')
+
+
+def sc04():
+    """rule-tiers 里写「校验器可阻断」的 ID 应该有脚本在 fire。标了「待实现」的不算。"""
+    t = read(os.path.join(ROOT, 'references', 'rule-tiers.md'))
+    head = t.split('## reviewed_invariant')[0]
+    claimed = set()
+    for line in head.splitlines():
+        if '待实现' in line:
+            continue
+        claimed |= set(re.findall(r'\| `([A-Z]{2,4}-\d{2})`', line))
+    fired = set()
+    for v in script_fired_ids().values():
+        fired |= v
+    missing = sorted(claimed - fired)
+    return rec('SC-04', not missing,
+               f'structural 表里 {len(claimed)} 个 ID 都有脚本' if not missing
+               else f'标了脚本可阻断但没有脚本：{missing}')
+
+
+def sc05():
+    names = [f for f in os.listdir(os.path.join(ROOT, 'scripts'))
+             if f.startswith('check_') and f.endswith('.py')]
+    g = read(os.path.join(ROOT, 'evaluations', 'gate.py'))
+    missing = [n for n in names if f"'{n}'" not in g]
+    return rec('SC-05', not missing,
+               f'gate.py 覆盖全部 {len(names)} 个检查脚本' if not missing
+               else f'gate.py 未覆盖：{missing}')
+
+
+def sc06():
+    reg = registered_ids()
+    cases = os.path.join(ROOT, 'evaluations', 'cases')
+    bad = []
+    if not os.path.isdir(cases):
+        return rec('SC-06', False, '缺 cases 目录')
+    names = sorted(d for d in os.listdir(cases) if os.path.isdir(os.path.join(cases, d)))
+    for n in names:
+        p = os.path.join(cases, n, 'expected.json')
+        if not os.path.isfile(p):
+            bad.append(f'{n} 缺 expected.json')
+            continue
+        exp = json.loads(read(p))
+        for _script, ids in (exp.get('must_fire') or {}).items():
+            for i in ids:
+                if i not in reg:
+                    bad.append(f'{n} must_fire 里的 {i} 未登记')
+        if not os.path.isfile(os.path.join(cases, n, 'delivery.md')):
+            bad.append(f'{n} 缺 delivery.md')
+    return rec('SC-06', not bad,
+               f'{len(names)} 个夹具，expected/must_fire 全部自洽' if not bad else ' | '.join(bad[:6]))
+
+
+_HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什么', '教训')
+
+
+def sc07():
+    """过时措辞：新主干里不该再有这些。讲历史/讲教训的行除外。
+
+    注意：焦距检查只覆盖 wan-renderer.md——SKILL.md 的默认输出模板走的是 Seedance 线，
+    那条线是否也该去掉焦距尚无实测依据，留给人工决定。
+    """
+    stale = {
+        'anchor': (['SKILL.md', 'references/wan-renderer.md'], [r'空间站位']),
+        'focal': (['references/wan-renderer.md'], [r'85mm', r'135mm', r'焦段']),
+        'density': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md'],
+                    [r'信息密度配额']),
+        'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
+    }
+    hits = []
+    for _key, (files, pats) in stale.items():
+        for f in files:
+            for ln, line in enumerate(read(os.path.join(ROOT, f)).splitlines(), 1):
+                if any(k in line for k in _HISTORY):
+                    continue
+                for p in pats:
+                    if re.search(p, line):
+                        hits.append(f'{f}:{ln} 「{p}」→ {line.strip()[:36]}')
+    return rec('SC-07', not hits, '新主干与 SKILL.md 无过时措辞' if not hits else ' | '.join(hits[:6]))
+
+
+def sc08():
+    bad = []
+    n = 0
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in ('.git', '.push-deepseek')]
+        for f in files:
+            if not f.endswith(('.md', '.py', '.json', '.yaml')):
+                continue
+            p = os.path.join(dirpath, f)
+            n += 1
+            raw = open(p, 'rb').read()
+            if raw.startswith(b'\xef\xbb\xbf'):
+                bad.append(f'{f} 有 BOM')
+            if '\ufffd' in raw.decode(_U8, errors='replace'):
+                bad.append(f'{f} 有替换字符')
+    return rec('SC-08', not bad, f'{n} 个文本文件编码干净' if not bad else ' | '.join(bad[:6]))
+
+
+def sc09():
+    if not os.path.isdir(INSTALLED):
+        return rec('SC-09', True, '未发现本机安装版，跳过')
+    src, bad, missing = [], [], 0
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in ('.git', '.push-deepseek')]
+        for f in files:
+            if f == '.last-run.txt':
+                continue
+            p = os.path.join(dirpath, f)
+            src.append(os.path.relpath(p, ROOT))
+    for rel in src:
+        d = os.path.join(INSTALLED, rel)
+        if not os.path.isfile(d):
+            missing += 1
+            continue
+        if open(os.path.join(ROOT, rel), 'rb').read() != open(d, 'rb').read():
+            bad.append(rel)
+    ok = (missing == 0 and not bad)
+    return rec('SC-09', ok,
+               f'安装版与源码一致（{len(src)} 文件）' if ok
+               else f'不一致 {len(bad)}｜缺失 {missing}：{(bad[:4] or [])}')
+
+
+def main():
+    ap = argparse.ArgumentParser(add_help=True)
+    ap.add_argument('--json', action='store_true')
+    a = ap.parse_args()
+
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09):
+        try:
+            fn()
+        except Exception as e:  # 自查本身出错也要报出来
+            rec(fn.__name__.upper(), False, f'自查项异常：{e}')
+
+    fails = [r for r in RESULT if not r['ok']]
+    if a.json:
+        print(json.dumps({'results': RESULT, 'failed': len(fails)}, ensure_ascii=False, indent=2))
+    else:
+        print('技能自查')
+        print('-' * 64)
+        for r in RESULT:
+            print(f'  {"✅" if r["ok"] else "❌"} [{r["id"]}] {r["msg"]}')
+        print('-' * 64)
+        print(f'{"全部通过" if not fails else str(len(fails)) + " 项不一致"}')
+    return 1 if fails else 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

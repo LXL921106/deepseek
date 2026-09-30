@@ -69,11 +69,14 @@
 确定性检查是**脚本，不是散文**：
 
 ```bash
+python scripts/check_units.py     --delivery 交付物.md      # 时长算式 · 装箱 · 单元格式
 python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --ledger 台账.md
-python scripts/check_timeline.py  --delivery 交付物.md
+python scripts/check_cast.py      --delivery 交付物.md      # 出场人物 · 锚点 · 同人声明
 ```
 
-[`evaluations/gate.py`](evaluations/gate.py) 回放 `evaluations/cases/` 里的夹具，如果某个守卫不再咬人、或开始误报，门禁就红。**脚本红了不得交付。**
+[`evaluations/gate.py`](evaluations/gate.py) 回放 `evaluations/cases/` 里的夹具，守卫不再咬人或开始误报就红。[`evaluations/selfcheck.py`](evaluations/selfcheck.py) 让技能**对照自己**体检。**脚本红了不得交付。**
+
+> **`FMT-01` 格式守卫**：交付物既不是「单元 N」也不是旧的「### Clip NN」时，检查器**直接报错，不静默通过**。教训：旧的 timeline 检查器曾在真实交付上读到 0 个分镜，把一份漏了 6 秒的提示词判成通过——**"读不到"绝不能长得像"没问题"**。
 
 为什么：散文清单分不清「我检查过了」和「我真的核对了」——漏掉的半句和完整的句子，看上去一模一样。
 
