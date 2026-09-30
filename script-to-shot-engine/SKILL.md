@@ -194,7 +194,18 @@ python scripts/check_timeline.py  --delivery 交付物.md
 
 覆盖 `DIA-01..05`、`AST-02`、`TIM-01..04`。**红了就改，改到绿为止。** 脚本报的每一条都指到具体的行或镜头。
 
-（DSH 环境用捆绑 Python：`~/.dsh/dsh-runtimes/*/dependencies/python/python.exe`。）
+**脚本吃文件**：先把剧本、交付物（提示词全文）、台账落成工作目录里的三个 `.md`，再跑。
+
+**路径**：脚本在**技能目录**里，不是当前工作目录。DSH 环境：
+
+```powershell
+$skill = Join-Path $env:USERPROFILE '.dsh\skills\script-to-shot-engine'
+$py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\python\python.exe" | Select-Object -First 1).FullName
+& $py "$skill\scripts\check_dialogue.py" --script 剧本.md --delivery 交付物.md --ledger 台账.md
+& $py "$skill\scripts\check_timeline.py"  --delivery 交付物.md
+```
+
+脚本只读文件、不写任何文件。**退出码 0 = 通过，1 = 有阻断项，2 = 用法或读取错误。** 加 `--json` 拿结构化结果。
 
 ### 第二层 · 审查者（每条须引用证据：哪一镜、第几行）
 
