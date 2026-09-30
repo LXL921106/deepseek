@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Seedance 2.x or Wan 3.0**
 
-![Version](https://img.shields.io/badge/version-2.5.5-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
@@ -47,6 +47,7 @@ Mixed scenes (talk first, fight later) can **switch modes clip by clip**.
 ```markdown
 ## Asset Reference Card      ← @asset names + short anchors; inferred looks auto-flagged
 ## Global Style Lock         ← six-slot style lock, emitted once for the whole film
+## Dialogue Coverage Ledger  ← one row per script line: full original string + landing shot + status
 ## Video Generation Prompts  ← per clip: spatial setup → shots (seamless timestamps) → end state → constraints
 ## Pre-flight Notes          ← up to three honest warnings
 ```
@@ -55,6 +56,28 @@ Mixed scenes (talk first, fight later) can **switch modes clip by clip**.
 - 🔗 **Long-scene splitting**: split at completed action/turning points; characters, weapons, seats, blood states carry across clips
 - 🎭 **Special stylization**: flashbacks, CCTV, hallucinations can be layered onto marked segments without polluting the global lock
 - 🧷 **Asset continuity**: weapon hand, downed bodies, extinguished light sources — tracked across clips
+
+## 🧪 Rules and gate (new in v3.0.0)
+
+Every rule is registered in [`references/rule-tiers.md`](references/rule-tiers.md) at one of four levels, each bound to a judge:
+
+| Level | Judge | Can block delivery |
+|---|---|---|
+| `structural_invariant` | **script** | ✅ |
+| `reviewed_invariant` | reviewer, citing evidence | needs evidence |
+| `craft_default` | creator — a stated reason overrides | ❌ |
+| `taste_option` | creator | ❌ never alone |
+
+Deterministic checks are **scripts, not prose**:
+
+```bash
+python scripts/check_dialogue.py --script script.md --delivery delivery.md --ledger ledger.md
+python scripts/check_timeline.py  --delivery delivery.md
+```
+
+[`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. **Script red = do not deliver.**
+
+Why: prose checklists cannot distinguish "I checked" from "I actually checked". A dropped half-line looks identical to a complete one.
 
 ## 🚀 Install
 
@@ -75,13 +98,16 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ## 🗂 Structure
 
 ```
-├── SKILL.md              # Entry: mode routing · capacity tiers · output protocol
-├── references/           # On-demand rules (choreography / assets / continuity / standoff / renderer)
-└── examples/             # Full examples (15s / 30s / 90s, action & standoff)
+├── SKILL.md              # Entry: rule tiers · routing · output protocol · 3-layer gate
+├── references/           # On-demand rules; rule-tiers.md registers every rule's level
+├── scripts/              # Deterministic validators (dialogue coverage, timestamps)
+├── evaluations/          # gate.py + cases/ — regression baseline ("no regression")
+├── examples/             # Full examples (15s / 30s / 90s, action & standoff)
+└── .agents/notes/        # Decision notes (implemented / rejected / simplification)
 ```
 
 ---
 
 <div align="center">
-Current version <b>v2.5.5</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
+Current version <b>v3.0.0</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
 </div>

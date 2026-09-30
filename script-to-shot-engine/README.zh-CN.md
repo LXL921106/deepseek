@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂 Seedance 2.x / 万相 3.0 的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-2.5.5-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
@@ -45,7 +45,8 @@
 ```markdown
 ## 美术资产对照卡        ← @资产名 + 短锚点，纯剧本推断外观自动标注
 ## 全局风格锁定          ← 六槽位风格锁定词，全场仅一次
-## 视频生成提示词        ← 每段：空间站位 → 逐镜头（时间戳首尾相接）→ 结尾状态 → 约束
+## 台词逐句回勾表        ← 一行一句：完整原句 + 落点 + 状态；落点为空即为漏句
+## 视频生成提示词        ← 每段：空间站位 → 逐分镜（时间戳首尾相接）→ 结尾状态 → 约束
 ## 生成前提醒            ← 最多三条，只写真正会翻车的事
 ```
 
@@ -53,6 +54,28 @@
 - 🔗 **连续拆段**：长戏按动作/张力结果处拆分，段间承接人物、武器、座位、血迹状态
 - 🎭 **特殊风格化**：回忆、监控、幻觉等局部段落可叠加特殊风格，不污染全片锁定
 - 🧷 **资产连续性**：武器持握手、倒地者位置、熄灭的光源，跨段严格追踪
+
+## 🧪 规则分级与门禁（v3.0.0 新增）
+
+每条规则都登记在 [`references/rule-tiers.md`](references/rule-tiers.md)，分四级并绑定判定者：
+
+| 级别 | 判定者 | 能否阻断交付 |
+|---|---|---|
+| `structural_invariant` | **脚本** | ✅ 能 |
+| `reviewed_invariant` | 审查者引用证据 | 需证据 |
+| `craft_default` | 创作者，**说明理由即可覆盖** | ❌ |
+| `taste_option` | 创作者 | ❌ **不得单独阻断** |
+
+确定性检查是**脚本，不是散文**：
+
+```bash
+python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --ledger 台账.md
+python scripts/check_timeline.py  --delivery 交付物.md
+```
+
+[`evaluations/gate.py`](evaluations/gate.py) 回放 `evaluations/cases/` 里的夹具，如果某个守卫不再咬人、或开始误报，门禁就红。**脚本红了不得交付。**
+
+为什么：散文清单分不清「我检查过了」和「我真的核对了」——漏掉的半句和完整的句子，看上去一模一样。
 
 ## 🚀 安装
 
@@ -73,13 +96,16 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ## 🗂 目录结构
 
 ```
-├── SKILL.md              # 主入口：模式路由 · 容量分档 · 输出协议
-├── references/           # 按需加载的规则（编排 / 资产 / 连续 / 对峙 / 渲染）
-└── examples/             # 打戏与对峙完整示例（15s / 30s / 90s）
+├── SKILL.md              # 主入口：规则分级 · 路由 · 输出协议 · 三层门禁
+├── references/           # 按需加载的规则；rule-tiers.md 登记每条规则的级别
+├── scripts/              # 确定性校验器（台词覆盖、时间戳）
+├── evaluations/          # gate.py + cases/ —— 回归基准（判定"没有退步"）
+├── examples/             # 打戏与对峙完整示例（15s / 30s / 90s）
+└── .agents/notes/        # 决策笔记（implemented / rejected / simplification）
 ```
 
 ---
 
 <div align="center">
-当前版本 <b>v2.5.5</b> · Seedance 2.x 与万相 3.0 各有专属渲染器，其他视频模型可沿用相同结构
+当前版本 <b>v3.0.0</b> · Seedance 2.x 与万相 3.0 各有专属渲染器，其他视频模型可沿用相同结构
 </div>
