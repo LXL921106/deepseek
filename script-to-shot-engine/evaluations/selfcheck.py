@@ -277,14 +277,17 @@ def sc11():
     """
     t = read(os.path.join(ROOT, 'references', 'rule-tiers.md'))
     seen, dup = {}, []
+    # 只认「定义行」：ID 必须落在该行的**第一个单元格**。
+    # 引用行（脚本覆盖表、降级记录）本来就会重复提到 ID，不算撞号。
     for ln, line in enumerate(t.splitlines(), 1):
-        for vid in re.findall(r'\| `([A-Z]{2,4}-\d{2})`', line):
-            if '待实现' in line and vid in seen:
-                continue
-            if vid in seen:
-                dup.append(f'{vid}（第 {seen[vid]} 行 与 第 {ln} 行）')
-            else:
-                seen[vid] = ln
+        m = re.match(r'\|\s*`([A-Z]{2,4}-\d{2})`\s*\|', line)
+        if not m:
+            continue
+        vid = m.group(1)
+        if vid in seen:
+            dup.append(f'{vid}（第 {seen[vid]} 行 与 第 {ln} 行）')
+        else:
+            seen[vid] = ln
     return rec('SC-11', not dup,
                f'{len(seen)} 个规则 ID 无重复定义' if not dup else f'ID 撞号：{dup}')
 
