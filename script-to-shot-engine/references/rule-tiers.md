@@ -94,12 +94,19 @@
 
 | 键 | 含义 | 示例值 |
 |---|---|---|
-| `open_with_visible_shot` | 开场第一镜必须是可见画面 | `true`（中景或全景） |
-| `no_background_music` | 全程无背景音乐 | `true` |
-| `max_shot_seconds` | 单次生成最长时长 | `15` |
-| `aspect_ratio` | 画幅 | `9:16` |
+| `title` | 剧名 | `爱与陪伴` |
 | `target_model` | 目标模型 | `Wan 3.0` |
+| `aspect_ratio` | 画幅 | `9:16` |
+| `max_shot_seconds` | 单次生成最长时长 | `15` |
+| `no_background_music` | 全程无背景音乐 | `true` |
+| `open_with_visible_shot` | 开场第一镜必须是可见画面 | `true`（中景或全景） |
 | `allow_intentional_overlap` | 允许注明后的时间重叠（音画分离／并行） | `true` |
+| `speaker_shot` | 说话人镜的机位；`frontal_single` = 正脸单人近景（clean single） | `frontal_single` |
+| `addressee_in_every_shot` | 每个含台词的分镜必须写「对〈人物名〉」 | `true` |
+| `upstream_frozen` | 上游 Clip 只读；发现上游有错必须停下问用户 | `true` |
+| `generated_is_readonly` | 已生成的提示词快照只读 | `true` |
+
+**模板与脚手架**：`templates/project/` ＋ `scripts/new_project.py`。建好的工作区里，`01-档案/项目档案.md` 就是这张表的实体，`01-档案/结尾状态链.md` 承载逐 Clip 的结尾状态（人物／姿势／持物／位置／朝向）。
 
 ## 降级记录（本次重构从"硬约束"降下来的）
 
