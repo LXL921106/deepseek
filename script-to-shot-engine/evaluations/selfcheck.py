@@ -181,7 +181,9 @@ def sc07():
     """
     stale = {
         'anchor': (['SKILL.md', 'references/wan-renderer.md'], [r'空间站位']),
-        'focal': (['references/wan-renderer.md'], [r'85mm', r'135mm', r'焦段']),
+        'focal': (['SKILL.md', 'references/wan-renderer.md', 'references/seedance-prompt-renderer.md',
+                   'references/dialogue-scene-mode.md', 'references/continuous-mode.md',
+                   'references/action-choreography-rules.md'], [r'85mm', r'135mm', r'焦段']),
         'density': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md'],
                     [r'信息密度配额']),
         'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
