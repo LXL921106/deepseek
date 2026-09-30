@@ -120,7 +120,7 @@ def check(units, has_unit=True, has_clip=False):
                              'msg': '交付物是**旧格式**（`### Clip NN`），本检查器只认'
                                     '「单元 N + 镜头 N |」——请按新格式重写'})
         elif any(u['shots'] for u in units):
-            blockers.append({'id': 'FMT-02',
+            blockers.append({'id': 'FMT-03',
                              'msg': '是单元格式，但**缺 `单元 N` 标题行**'})
         else:
             blockers.append({'id': 'FMT-01',

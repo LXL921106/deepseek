@@ -133,7 +133,7 @@ def check(units, has_unit=True, has_clip=False):
                                     '「单元 N + 镜头 N | + 时长计算」——请按新格式重写；'
                                     '若确实要审历史旧格式交付，请用 check_timeline.py'})
         elif any(u['shots'] for u in units):
-            blockers.append({'id': 'FMT-02',
+            blockers.append({'id': 'FMT-03',
                              'msg': '是单元格式，但**缺 `单元 N` 标题行**——§10 要求每个单元以'
                                     '`单元 N` 单独一行打头（门禁才能识别这是第几个单元）'})
         else:

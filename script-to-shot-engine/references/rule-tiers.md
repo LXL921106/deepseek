@@ -34,7 +34,7 @@
 | `AST-01` | 正文所有 `@引用` 必须在「美术资产对照卡」登记 | 集合比对 ｜ **待实现——尚无脚本，不要声称它被阻断** |
 | `AST-02` | 正文不得用 `图N`／`图片N` 指代人物（必须写人物名） | 正则 |
 | `FMT-01` | 交付物必须是「单元 N + 镜头 N \|」格式，或明确的旧格式；两者都不是即报错 | 格式守卫 |
-| `FMT-02` | 每个单元必须以 `单元 N` **单独一行打头** | 格式守卫 |
+| `FMT-03` | 每个单元必须以 `单元 N` **单独一行打头** | 格式守卫 |
 | `PRJ-01` | 项目档案中创作者已接受的值（如「开场用可见画面」「无背景音乐」）在交付物中被满足 | 值比对 ｜ **待实现——尚无脚本** |
 | `CNT-05` | 空间站位写成「画面从左到右」的有序排列；人名不重复、不出现未登记的人 | 解析＋集合比对 |
 | `CNT-06` | 每个分镜写「在场人物：…」，且必须是排列里出现过的名字 | 逐镜集合比对 |
@@ -139,12 +139,13 @@
 
 | 脚本 | 覆盖 | 线路 | 用法 |
 |---|---|---|---|
-| `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01` | **Wan 新格式（本线）** | `python check_units.py --delivery 交付物.md` |
-| `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01` | **Wan 新格式（本线）** | `python check_cast.py --delivery 交付物.md` |
+| `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01`／`FMT-03` | **Wan 新格式（本线）** | `python check_units.py --delivery 交付物.md` |
+| `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01`／`FMT-03` | **Wan 新格式（本线）** | `python check_cast.py --delivery 交付物.md` |
 | `scripts/check_dialogue.py` | `DIA-01`–`DIA-05`、`AST-02` | **两条线通用** | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
 | `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | **仅历史旧格式交付** | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
 
-**`FMT-01` 格式守卫**：`check_units.py` 与 `check_cast.py` 发现交付物既不是「单元 N」也不是「### Clip NN」时**直接报错**，不静默通过。
+**格式守卫（`FMT-01`／`FMT-03`）**：`check_units.py` 与 `check_cast.py` 发现交付物既不是「单元 N」也不是「### Clip NN」时**直接报错**（`FMT-01`）；是单元格式但**缺 `单元 N` 标题行**也直接报错（`FMT-03`）。**都不静默通过。**
+> 注意 `FMT-02` 是另一条：台账表的列与排版（第三层，不阻断）。**新 ID 一定要先在本表里查重**——`selfcheck` 的 `SC-11` 现在会查。
 > 教训：`check_timeline.py` 曾因找不到 `### Clip NN` 而一个分镜都没读到，把一份漏了 6 秒的提示词判成"通过"。**"读不到内容"必须和"内容没问题"区分开。**
 
 **`check_timeline.py` 已不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担。保留它只为**历史旧格式交付**（老产物仍然要能审）。

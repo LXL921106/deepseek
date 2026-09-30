@@ -269,12 +269,32 @@ def sc10():
                else f'缺 UTF-8 兜底：{bad}')
 
 
+def sc11():
+    """规则 ID 不得重复定义。
+
+    教训：加 `FMT-02`（缺单元标题）时没先查表——而 `FMT-02` 早已被「台账排版」占用。
+    **同一个 ID 两个含义，比没有 ID 更糟**：引用它的人不知道该按哪条执行。
+    """
+    t = read(os.path.join(ROOT, 'references', 'rule-tiers.md'))
+    seen, dup = {}, []
+    for ln, line in enumerate(t.splitlines(), 1):
+        for vid in re.findall(r'\| `([A-Z]{2,4}-\d{2})`', line):
+            if '待实现' in line and vid in seen:
+                continue
+            if vid in seen:
+                dup.append(f'{vid}（第 {seen[vid]} 行 与 第 {ln} 行）')
+            else:
+                seen[vid] = ln
+    return rec('SC-11', not dup,
+               f'{len(seen)} 个规则 ID 无重复定义' if not dup else f'ID 撞号：{dup}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来
