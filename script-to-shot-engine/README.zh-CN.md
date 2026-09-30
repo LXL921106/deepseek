@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂 Seedance 2.x 的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-2.3.2-blue)
+![Version](https://img.shields.io/badge/version-2.3.3-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Lang](https://img.shields.io/badge/提示词-中文-green)
@@ -80,5 +80,5 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ---
 
 <div align="center">
-当前版本 <b>v2.3.2</b> · 适用 Seedance 2.x，其他视频模型可沿用相同结构
+当前版本 <b>v2.3.3</b> · 适用 Seedance 2.x，其他视频模型可沿用相同结构
 </div>

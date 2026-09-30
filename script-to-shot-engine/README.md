@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Seedance 2.x**
 
-![Version](https://img.shields.io/badge/version-2.3.2-blue)
+![Version](https://img.shields.io/badge/version-2.3.3-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -82,5 +82,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v2.3.2</b> · Built for Seedance 2.x — the structure transfers to other video models
+Current version <b>v2.3.3</b> · Built for Seedance 2.x — the structure transfers to other video models
 </div>
