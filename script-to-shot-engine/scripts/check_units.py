@@ -116,7 +116,7 @@ def parse(text):
 def check(units, has_unit=True, has_clip=False):
     blockers, warnings, info = [], [], []
 
-    # FMT-01 格式守卫：不认识就报错，不要静默通过
+    # FMT-01/02 格式守卫：不认识就报错，不要静默通过
     # （实测教训：check_timeline 曾因找不到 `### Clip NN` 而一个分镜都没读到，把漏了 6 秒的提示词判成通过）
     if not has_unit:
         if has_clip:
@@ -124,6 +124,10 @@ def check(units, has_unit=True, has_clip=False):
                              'msg': '交付物是**旧格式**（`### Clip NN`）。本渲染器已换主干为'
                                     '「单元 N + 镜头 N | + 时长计算」——请按新格式重写；'
                                     '若确实要审历史旧格式交付，请用 check_timeline.py'})
+        elif any(u['shots'] for u in units):
+            blockers.append({'id': 'FMT-02',
+                             'msg': '是单元格式，但**缺 `单元 N` 标题行**——§10 要求每个单元以'
+                                    '`单元 N` 单独一行打头（门禁才能识别这是第几个单元）'})
         else:
             blockers.append({'id': 'FMT-01',
                              'msg': '交付物里既没有「单元 N」也没有「### Clip NN」——'
