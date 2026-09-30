@@ -35,6 +35,8 @@
 | `AST-02` | 正文不得用 `图N`／`图片N` 指代人物（必须写人物名） | 正则 |
 | `FMT-01` | 五个交付部分的标题存在；台账表头存在 | 正则 |
 | `PRJ-01` | 项目档案中创作者已接受的值（如「开场用可见画面」「无背景音乐」）在交付物中被满足 | 值比对 |
+| `CNT-05` | 空间站位写成「画面从左到右」的有序排列；人名不重复、不出现未登记的人 | 解析＋集合比对 |
+| `CNT-06` | 每个分镜写「在场人物：…」，且必须是排列里出现过的名字 | 逐镜集合比对 |
 
 > `PRJ-01` 是通用出口：任何"本项目的固定选择"都记进项目档案，然后由脚本按值校验。**不要为每一个项目选择新增一条规则。**
 
@@ -50,6 +52,7 @@
 | `AUD-01` | 需要画外音的分镜，画面里的人不得有口部动作（脚本可**提示**命中，永不阻断） |
 | `CNT-01` | 物理锁死五项（持握手／朝向／距离／接触点／步速）在每个分镜可查 |
 | `CNT-02` | 跨 Clip 承接上一段末态 |
+| `CNT-07` | 走位只改顺序不改人数；人物走动写在发生它的那个分镜里 |
 | `TAS-01` | 内容—时长匹配：分镜时长显著大于「台词＋动作所需」时，必须在镜内写明理由（凝滞／等待／压迫感） |
 
 ## craft_default（创作者说明理由即可覆盖）
@@ -101,7 +104,8 @@
 | `no_background_music` | 全程无背景音乐 | `true` |
 | `open_with_visible_shot` | 开场第一镜必须是可见画面 | `true`（中景或全景） |
 | `allow_intentional_overlap` | 允许注明后的时间重叠（音画分离／并行） | `true` |
-| `speaker_shot` | 说话人镜的机位；`frontal_single` = 正脸单人近景（clean single） | `frontal_single` |
+| `speaker_shot` | 说话人镜的机位；`frontal_single` = 正脸单人近景（clean single）。**无台词分镜允许侧面** | `frontal_single` |
+| `on_screen_cast_per_shot` | 每个分镜写「在场人物：…」，且必须是排列里出现过的名字 | `true` |
 | `addressee_in_every_shot` | 每个含台词的分镜必须写「对〈人物名〉」 | `true` |
 | `upstream_frozen` | 上游 Clip 只读；发现上游有错必须停下问用户 | `true` |
 | `generated_is_readonly` | 已生成的提示词快照只读 | `true` |
@@ -127,7 +131,8 @@
 | 脚本 | 覆盖 | 用法 |
 |---|---|---|
 | `scripts/check_dialogue.py` | `DIA-01`–`DIA-05` | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
-| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | `python check_timeline.py --delivery 交付物.md` |
+| `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
+| `scripts/check_cast.py` | `CNT-05`–`CNT-07` | `python check_cast.py --delivery 交付物.md` |
 
 DSH 环境用捆绑 Python：`~/.dsh/dsh-runtimes/*/dependencies/python/python.exe`。
 

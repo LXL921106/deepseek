@@ -32,6 +32,7 @@ CASES = os.path.join(HERE, 'cases')
 CHECKERS = {
     'check_dialogue.py': ['--script', 'script.md', '--delivery', 'delivery.md', '--ledger', 'ledger.md'],
     'check_timeline.py': ['--delivery', 'delivery.md'],
+    'check_cast.py': ['--delivery', 'delivery.md'],
 }
 
 

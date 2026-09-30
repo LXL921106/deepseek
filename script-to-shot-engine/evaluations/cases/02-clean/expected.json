@@ -1,10 +1,15 @@
 {
   "case": "02-clean",
-  "what": "反向对照：正确交付必须零阻断（证明门禁不误报）",
+  "what": "反向对照：正确交付必须零阻断（证明门禁不误报）。**每加一个脚本，就把它的 ID 加进 must_not_fire**，否则新脚本在这个案例上假通过。",
   "planted_defects": [],
   "must_fire": {
     "check_dialogue.py": [],
-    "check_timeline.py": []
+    "check_timeline.py": [],
+    "check_cast.py": []
   },
-  "must_not_fire": ["DIA-01", "DIA-02", "DIA-03", "DIA-04", "DIA-05", "AST-02", "TIM-01", "TIM-02", "TIM-03", "TIM-04"]
+  "must_not_fire": [
+    "DIA-01", "DIA-02", "DIA-03", "DIA-04", "DIA-05", "AST-02",
+    "TIM-01", "TIM-02", "TIM-03", "TIM-04",
+    "CNT-05", "CNT-06", "CNT-07"
+  ]
 }
