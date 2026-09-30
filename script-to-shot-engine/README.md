@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Seedance 2.x or Wan 3.0**
 
-![Version](https://img.shields.io/badge/version-2.5.4-blue)
+![Version](https://img.shields.io/badge/version-2.5.5-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
@@ -83,5 +83,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v2.5.4</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
+Current version <b>v2.5.5</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
 </div>
