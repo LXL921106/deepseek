@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂 Seedance 2.x / 万相 3.0 的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-2.4.0-blue)
+![Version](https://img.shields.io/badge/version-2.5.0-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
@@ -36,7 +36,7 @@
 | **适用** | 打斗、追逐、枪战、玄幻、Boss 战 | 谈判、审问、摊牌、决裂等台词戏 |
 | **因果链** | 发起 → 防守 → 命中 → 受力 → 恢复 | 施压 → 承受 → 泄露/反制 → 新平衡 |
 | **镜头密度** | 15 秒 ≥10 镜，单镜 1–2 秒 | 15 秒 5–8 镜，单镜 2–4 秒 |
-| **台词** | 点缀 | 剧本原句完整入镜，一句不跨镜 |
+| **台词** | 点缀 | 剧本原句完整入镜；默认一句一镜，音画分离时按音频桥跨镜 |
 
 混合场景（先文后武）可**逐段切换**两种模式。
 
@@ -81,5 +81,5 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ---
 
 <div align="center">
-当前版本 <b>v2.4.0</b> · Seedance 2.x 与万相 3.0 各有专属渲染器，其他视频模型可沿用相同结构
+当前版本 <b>v2.5.0</b> · Seedance 2.x 与万相 3.0 各有专属渲染器，其他视频模型可沿用相同结构
 </div>

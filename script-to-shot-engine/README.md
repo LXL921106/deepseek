@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Seedance 2.x or Wan 3.0**
 
-![Version](https://img.shields.io/badge/version-2.4.0-blue)
+![Version](https://img.shields.io/badge/version-2.5.0-blue)
 ![Model](https://img.shields.io/badge/Seedance-2.x-orange)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
@@ -38,7 +38,7 @@ Prompts are generated in Chinese by design — Seedance handles them best that w
 | **For** | Fights, chases, gunfights, fantasy, boss battles | Negotiation, interrogation, showdowns — dialogue-driven scenes |
 | **Causal chain** | Attack → Block → Hit → Impact → Recover | Pressure → Endure → Slip/Counter → New balance |
 | **Shot density** | ≥10 shots per 15s, 1–2s each | 5–8 shots per 15s, 2–4s each |
-| **Dialogue** | Incidental | Full script lines embedded in shots, never split across shots |
+| **Dialogue** | Incidental | Full script lines embedded in shots; one line per shot by default, audio-bridged across shots when the picture must leave the speaker |
 
 Mixed scenes (talk first, fight later) can **switch modes clip by clip**.
 
@@ -83,5 +83,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v2.4.0</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
+Current version <b>v2.5.0</b> · Dedicated renderers for Seedance 2.x and Wan 3.0 — the structure transfers to other video models
 </div>
