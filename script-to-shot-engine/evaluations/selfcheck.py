@@ -25,6 +25,14 @@ import os
 import re
 import sys
 
+
+# Windows 控制台默认 GBK：✅/❌ 会抛 UnicodeEncodeError，把门禁直接打崩
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, ValueError):
+        pass
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 INSTALLED = os.path.join(os.path.expanduser('~'), '.dsh', 'skills', 'script-to-shot-engine')
@@ -238,12 +246,35 @@ def sc09():
                else f'不一致 {len(bad)}｜缺失 {missing}：{(bad[:4] or [])}')
 
 
+def sc10():
+    """每个脚本都要有 UTF-8 兜底。
+
+    Windows 控制台默认 GBK，脚本里的 ✅/❌ 会抛 UnicodeEncodeError **把门禁直接打崩**。
+    之前一直没暴露，是因为运行时手动设了 PYTHONIOENCODING=utf-8——
+    「在某个人的机器上能跑」不等于「能跑」。
+    """
+    bad = []
+    for d in ('scripts', 'evaluations'):
+        p = os.path.join(ROOT, d)
+        if not os.path.isdir(p):
+            continue
+        for f in sorted(os.listdir(p)):
+            if not f.endswith('.py'):
+                continue
+            t = read(os.path.join(p, f)).replace('"', "'")
+            if "reconfigure(encoding='utf-8'" not in t:
+                bad.append(f'{d}/{f}')
+    return rec('SC-10', not bad,
+               '所有脚本都有 UTF-8 兜底（Windows GBK 控制台不会崩）' if not bad
+               else f'缺 UTF-8 兜底：{bad}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来

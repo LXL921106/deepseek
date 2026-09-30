@@ -26,6 +26,14 @@ import json
 import re
 import sys
 
+
+# Windows 控制台默认 GBK：✅/❌ 会抛 UnicodeEncodeError，把门禁直接打崩
+for _s in (sys.stdout, sys.stderr):
+    try:
+        _s.reconfigure(encoding='utf-8', errors='replace')
+    except (AttributeError, ValueError):
+        pass
+
 _UNIT = re.compile(r'^#*\s*单元\s*(\d+)')
 _CLIP_LEGACY = re.compile(r'^#{2,4}\s*Clip\s*0*\d+', re.IGNORECASE)
 _SHOT = re.compile(r'^#*\s*镜头\s*(\d+)\s*[|｜]\s*(.*)$')
