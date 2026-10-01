@@ -191,6 +191,9 @@ def sc07():
         'density': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md'],
                     [r'信息密度配额']),
         'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
+        # 「一轮只出一个单元」已废弃：它让"先分镜后装箱"根本没法发生
+        'one_unit': (['SKILL.md', 'references/wan-renderer.md'],
+                     [r'只输出 1 个单元', r'一次只输出', r'下一单元从', r'→ 第一个单元']),
     }
     hits = []
     for _key, (files, pats) in stale.items():
