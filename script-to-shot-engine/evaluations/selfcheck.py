@@ -178,7 +178,7 @@ def sc06():
                f'{len(names)} 个夹具，expected/must_fire 全部自洽' if not bad else ' | '.join(bad[:6]))
 
 
-_HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什么', '教训')
+_HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什么', '教训', '旧写法')
 
 
 def sc07():
