@@ -183,17 +183,26 @@ _HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什�
 
 def sc07():
     """过时措辞：全技能不该再有这些。讲历史/讲教训的行除外。"""
+    # 规范文件全集（不含 examples／cases：那是历史产物，另有「不要照抄」警告）
+    SPEC = ['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+            'references/continuous-mode.md', 'references/action-choreography-rules.md',
+            'references/rule-tiers.md', 'references/pre-shot-checklist.md',
+            'references/asset-anchor-protocol.md', 'templates/project/01-档案/项目档案.md']
     stale = {
-        'anchor': (['SKILL.md', 'references/wan-renderer.md'], [r'空间站位']),
-        'focal': (['SKILL.md', 'references/wan-renderer.md',
-                   'references/dialogue-scene-mode.md', 'references/continuous-mode.md',
-                   'references/action-choreography-rules.md'], [r'85mm', r'135mm', r'焦段']),
-        'density': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md'],
-                    [r'信息密度配额']),
+        'anchor': (SPEC, [r'空间站位', r'在场人物']),
+        'focal': (SPEC, [r'85mm', r'135mm', r'焦段']),
+        'density': (SPEC, [r'信息密度配额']),
         'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
         # 「一轮只出一个单元」已废弃：它让"先分镜后装箱"根本没法发生
         'one_unit': (['SKILL.md', 'references/wan-renderer.md'],
                      [r'只输出 1 个单元', r'一次只输出', r'下一单元从', r'→ 第一个单元']),
+        # 旧格式残留：台账/接续必须用「单元」，不能再出现 Clip
+        'clip_ref': (['SKILL.md', 'references/wan-renderer.md'],
+                     [r'Clip ?\d+ ?镜头', r'跨 Clip']),
+        # 语速只许有一套数字。旧表（3／4／5.5）不许回到规范文件里
+        'rate2': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+                   'references/rule-tiers.md', 'templates/project/01-档案/项目档案.md'],
+                  [r'≈\s*3\s*字/秒', r'≈\s*4\s*字/秒', r'≈\s*5—5\.5', r'4—5\s*字/秒', r'5—5\.5\s*字/秒']),
     }
     hits = []
     for _key, (files, pats) in stale.items():

@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂万相 3.0（Wan 3.0）的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-4.5.0-blue)
+![Version](https://img.shields.io/badge/version-4.6.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Lang](https://img.shields.io/badge/提示词-中文-green)
@@ -45,7 +45,7 @@
 ## 美术资产对照卡        ← @资产名 + 短锚点，纯剧本推断外观自动标注
 ## 全局风格锁定          ← 六槽位风格锁定词，全场仅一次
 ## 台词逐句回勾表        ← 一行一句：完整原句 + 落点 + 状态；落点为空即为漏句
-## 视频生成提示词        ← 每段：空间站位 → 逐分镜（时间戳首尾相接）→ 结尾状态 → 约束
+## 视频生成提示词        ← 每单元：锚点清单＋人物初始位置 → 逐镜头（时长计算）→ 总计
 ## 生成前提醒            ← 最多三条，只写真正会翻车的事
 ```
 
@@ -109,5 +109,5 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ---
 
 <div align="center">
-当前版本 <b>v4.5.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
+当前版本 <b>v4.6.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
 </div>
