@@ -345,27 +345,31 @@ REQUIRED_FIELDS = ('场景', '出场人物', '空间坐标', '同人声明', '�
 
 
 def sc13():
-    """SKILL.md 必须**只指向** §9 模板，不得重述逐镜字段。
+    """SKILL.md 的「逐镜写」必须指向 group-format.md，且**不许重述字段**。
 
-    老版本的 SC-13 是"两处字段表必须一致"——那是在给**重复**做守卫。
-    拆开之后正确的纪律是**没有重复**：逐镜字段只有一个家（`output.md` §9）。
-    **少一处重述，就少一处打架。**
+    教训：v6.0.0 换主干后，SKILL.md 的「逐镜写」还指着 `output.md` §9 的**旧单元模板**
+    （`### 镜头 NN | …` 二十个字段）——新会话照它写，而门禁只认组格式，**直接 FMT-01**。
+    老版 SC-13 只查"有没有指向"，**没查"指向的东西对不对"**。指向也要验。
     """
     skill = read(os.path.join(ROOT, 'SKILL.md'))
     m = re.search(r'逐镜写[^\n]*', skill)
     if not m:
         return rec('SC-13', False, '定位不到 SKILL.md 的「逐镜写」指引')
     line = m.group(0)
-    # 「重述字段表」= 列了一**串**字段。只提一两个词（例如标题格式里的 `运镜方式`）不算。
+    if '### 镜头' in line:
+        return rec('SC-13', False, 'SKILL.md 还在教废弃的 `### 镜头 NN` 写法')
     dup = [f for f in REQUIRED_FIELDS if f in line]
     if len(dup) >= 4:
         return rec('SC-13', False,
-                   f'SKILL.md 又重述了逐镜字段 {dup[:6]}（共 {len(dup)} 个）——'
-                   f'应只指向 output.md §9，字段只有一个家')
-    ok = 'output.md' in line and '不重述' in line
-    return rec('SC-13', ok,
-               'SKILL.md 只指向 output.md §9，不重述逐镜字段' if ok
-               else '「逐镜写」没有指向 output.md §9')
+                   f'SKILL.md 又重述了逐镜字段 {dup[:6]}（共 {len(dup)} 个）——字段只有一个家')
+    if 'group-format.md' not in line:
+        return rec('SC-13', False, '「逐镜写」没有指向 group-format.md')
+    gf = read(os.path.join(ROOT, 'references', 'group-format.md'))
+    # 结构性判据：必须有一条「镜〈编号〉｜〈起〉—〈止〉s｜…」的镜行示范。
+    # （不写字面量 `镜N｜`——文件里用的是 `镜1｜`／`镜2｜`，死抠字面会假红。）
+    if not re.search(r'镜[\dN]\s*｜\s*[\d{][\d.]*—[\d{]', gf):
+        return rec('SC-13', False, '指向的 group-format.md 里没有组格式的镜行示范（`镜N｜起—止s｜…`）')
+    return rec('SC-13', True, 'SKILL.md 指向 group-format.md，且那里确实是组格式')
 
 
 # 配额行的解析：`15 秒：… 5—8 镜，单镜 2—4 秒` / `30 秒 … 10—18 镜`
@@ -475,10 +479,12 @@ def sc17():
                 continue
             for ln, line in enumerate(read(os.path.join(dirpath, f)).split('\n'), 1):
                 if '单元' in line and not OK.search(line):
-                    hit.append(f'{rel}:{ln}')
+                    hit.append(f'{rel}:{ln} 单元')
+                if re.search(r'###\s*镜头\s*\d', line) and 'examples/' not in rel:
+                    hit.append(f'{rel}:{ln} 旧镜标题')
     return rec('SC-17', not hit,
-               '交付格式只叫「组」，没有残留的「单元」' if not hit
-               else f'仍把交付格式叫「单元」：{hit[:6]}')
+               '交付格式只叫「组」，没有残留的「单元」或旧镜标题' if not hit
+               else f'仍是旧格式：{hit[:6]}')
 
 
 def main():
