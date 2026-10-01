@@ -75,7 +75,7 @@ python scripts/check_dialogue.py --script script.md --delivery delivery.md --led
 
 [`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. [`evaluations/selfcheck.py`](evaluations/selfcheck.py) audits the skill against itself. **Script red = do not deliver.**
 
-> `FMT-01` **format guard**: a delivery that is neither the `组 N` format nor the legacy `单元 N` / `组 N` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
+> `FMT-01` **format guard**: a delivery that is not the `组 N` format makes the checkers **error out instead of silently passing** — **"couldn't read it" must never look like "it's fine"**.
 
 Why: prose checklists cannot distinguish "I checked" from "I actually checked". A dropped half-line looks identical to a complete one.
 
