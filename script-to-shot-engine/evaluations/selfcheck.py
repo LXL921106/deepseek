@@ -184,10 +184,14 @@ _HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什�
 def sc07():
     """过时措辞：全技能不该再有这些。讲历史/讲教训的行除外。"""
     # 规范文件全集（不含 examples／cases：那是历史产物，另有「不要照抄」警告）
-    SPEC = ['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+    SPEC = ['SKILL.md', 'references/constraints.md', 'references/setup.md',
+            'references/space.md', 'references/timing.md', 'references/shots.md',
+            'references/dialogue.md', 'references/output.md', 'references/gates.md',
+            'references/troubleshooting.md', 'references/dialogue-scene-mode.md',
             'references/continuous-mode.md', 'references/action-choreography-rules.md',
             'references/rule-tiers.md', 'references/pre-shot-checklist.md',
-            'references/asset-anchor-protocol.md', 'templates/project/01-档案/项目档案.md']
+            'references/asset-anchor-protocol.md',
+            'templates/project/01-档案/项目档案.md']
     stale = {
         'anchor': (SPEC, [r'空间站位', r'在场人物']),
         'focal': (SPEC, [r'85mm', r'135mm', r'焦段']),
@@ -195,17 +199,19 @@ def sc07():
         # 台词字数不单列（字数只出现在「时长计算」的算式里）
         'charfield': (SPEC, [r'台词字数约']),
         # 旧的加数名（现统一叫「表演与停顿」）
-        'oldadd': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+        'oldadd': (['SKILL.md', 'references/timing.md', 'references/dialogue.md',
+                    'references/dialogue-scene-mode.md',
                     'templates/project/01-档案/项目档案.md'], [r'口型缓冲', r'情绪停顿']),
-        'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
+        'old_shot': (['references/timing.md'], [r'^分镜\d+（']),
         # 「一轮只出一个单元」已废弃：它让"先分镜后装箱"根本没法发生
-        'one_unit': (['SKILL.md', 'references/wan-renderer.md'],
+        'one_unit': (['SKILL.md', 'references/timing.md'],
                      [r'只输出 1 个单元', r'一次只输出', r'下一单元从', r'→ 第一个单元']),
         # 旧格式残留：台账/接续必须用「单元」，不能再出现 Clip
-        'clip_ref': (['SKILL.md', 'references/wan-renderer.md'],
+        'clip_ref': (['SKILL.md', 'references/timing.md'],
                      [r'Clip ?\d+ ?镜头', r'跨 Clip']),
         # 语速只许有一套数字。旧表（3／4／5.5）不许回到规范文件里
-        'rate2': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+        'rate2': (['SKILL.md', 'references/timing.md', 'references/dialogue.md',
+                    'references/dialogue-scene-mode.md',
                    'references/rule-tiers.md', 'templates/project/01-档案/项目档案.md'],
                   [r'≈\s*3\s*字/秒', r'≈\s*4\s*字/秒', r'≈\s*5—5\.5', r'4—5\s*字/秒', r'5—5\.5\s*字/秒']),
     }
@@ -315,7 +321,7 @@ def sc12():
     教训：`DIA-15` 说"永不写字字清晰"，而 §6.1 的台词句式表里**每一行都带着它**——
     改了规则没扫载体，模型照模板写，规则等于没改。
     """
-    files = ('SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+    files = ('SKILL.md', 'references/timing.md', 'references/dialogue-scene-mode.md',
              'references/pre-shot-checklist.md', 'templates/project/01-档案/项目档案.md')
     okmark = ('不要', '永不', '禁止', '✗', '教训')
     hit = []
@@ -339,21 +345,25 @@ REQUIRED_FIELDS = ('场景', '出场人物', '空间坐标', '同人声明', '�
 
 
 def sc13():
-    """入口文件 SKILL.md 的逐镜字段表，必须覆盖 §9 模板里的每一个字段。
+    """SKILL.md 必须**只指向** §9 模板，不得重述逐镜字段。
 
-    教训（栽过两次）：§9 加了 `台词同期`／`停顿`，SKILL.md 没跟上；
-    再补 `台词节奏` 时 SKILL.md 又漏了。而 **SKILL.md 是新会话读的第一份文件**——
-    它列的字段就是模型会写的字段，漏一个就等于那格白加。
+    老版本的 SC-13 是"两处字段表必须一致"——那是在给**重复**做守卫。
+    拆开之后正确的纪律是**没有重复**：逐镜字段只有一个家（`output.md` §9）。
+    **少一处重述，就少一处打架。**
     """
     skill = read(os.path.join(ROOT, 'SKILL.md'))
-    m = re.search(r'时长计算.{0,4}（.*?）(.{0,900}?)完整模板见', skill, re.S)
+    m = re.search(r'逐镜写[^\n]*', skill)
     if not m:
-        return rec('SC-13', False, '定位不到 SKILL.md 步骤 5 的字段表')
-    seg = m.group(1)
-    miss = [f for f in REQUIRED_FIELDS if f not in seg]
-    return rec('SC-13', not miss,
-               f'SKILL.md 步骤 5 覆盖全部 {len(REQUIRED_FIELDS)} 个逐镜字段' if not miss
-               else f'SKILL.md 步骤 5 漏了：{miss}')
+        return rec('SC-13', False, '定位不到 SKILL.md 的「逐镜写」指引')
+    line = m.group(0)
+    dup = [f for f in REQUIRED_FIELDS if f in line]
+    if dup:
+        return rec('SC-13', False,
+                   f'SKILL.md 又重述了逐镜字段 {dup[:5]}——应只指向 output.md §9，字段只有一个家')
+    ok = 'output.md' in line and '不重述' in line
+    return rec('SC-13', ok,
+               'SKILL.md 只指向 output.md §9，不重述逐镜字段' if ok
+               else '「逐镜写」没有指向 output.md §9')
 
 
 # 配额行的解析：`15 秒：… 5—8 镜，单镜 2—4 秒` / `30 秒 … 10—18 镜`
@@ -373,7 +383,7 @@ def sc14():
     """
     files = ['SKILL.md', 'references/dialogue-scene-mode.md',
              'references/action-choreography-rules.md', 'references/continuous-mode.md',
-             'references/wan-renderer.md']
+             'references/timing.md']
     bad, seen = [], []
     for f in files:
         p = os.path.join(ROOT, f)
@@ -394,12 +404,55 @@ def sc14():
                f'{len(seen)} 条数值配额，算术上都成立' if not bad else ' | '.join(bad[:4]))
 
 
+def sc15():
+    """SKILL.md 的文件地图必须索引 references/ 下每一个 .md，且不链到不存在的文件。
+
+    教训：所有主题塞在一个文件里时，"改了 A 节、B 节还留着旧说法"没人能发现。
+    拆开之后，**"有没有被索引"就变成了机器可查的事**。
+    """
+    skill = read(os.path.join(ROOT, 'SKILL.md'))
+    refdir = os.path.join(ROOT, 'references')
+    have = {f for f in os.listdir(refdir) if f.endswith('.md')}
+    linked = set(re.findall(r'\]\(references/([^)]+\.md)\)', skill))
+    dead = sorted(x for x in linked if x not in have)
+    missing = sorted(have - linked)
+    if dead:
+        return rec('SC-15', False, f'SKILL.md 链到不存在的文件：{dead}')
+    return rec('SC-15', not missing,
+               f'SKILL.md 索引了全部 {len(have)} 个 references 文件' if not missing
+               else f'没被 SKILL.md 索引：{missing}')
+
+
+def sc16():
+    """正文里引用的 §N，必须有对应的 `# §N` 标题。
+
+    教训：我们特意**保留 `# §N` 编号不做重排**——因为正文里有大量「见 §5.1」。
+    重排编号 = 全部指空。这条守卫让"指空"当场变红。
+    """
+    text = ''
+    for d in ('', 'references', 'templates', 'evaluations'):
+        base = os.path.join(ROOT, d) if d else ROOT
+        if not os.path.isdir(base):
+            continue
+        for f in sorted(os.listdir(base)):
+            if f.endswith('.md'):
+                text += read(os.path.join(base, f)) + '\n'
+    defined = set(re.findall(r'(?m)^#\s*§(\d+)', text))
+    defined |= {m.split('.')[0] for m in re.findall(r'(?m)^##\s*(\d+\.\d+)', text)}
+    mentioned = set(re.findall(r'§(\d+)', text))
+    undef = sorted(mentioned - defined, key=lambda x: int(x))
+    return rec('SC-16', not undef,
+               f'{len(mentioned)} 个 §N 引用全部有对应章节' if not undef
+               else f'引用指空：{["§" + x for x in undef]}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12, sc13, sc14):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12,
+               sc13, sc14, sc15, sc16):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来

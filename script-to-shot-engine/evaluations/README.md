@@ -79,7 +79,7 @@ python selfcheck.py
 
 > ⚠️ **`cases/*/delivery.md` 不要照抄。** 它们是**历史产物**（按当时的规则写的）或**故意带缺陷的夹具**——
 > 里面还留着 `字字清晰`／`语速缓慢`／`85mm` 这类**现在已被禁**的写法，留着是为了固定守卫的行为，
-> **不是范例**。写作口径一律以 [`../references/wan-renderer.md`](../references/wan-renderer.md) 为准。
+> **不是范例**。写作口径以 `SKILL.md` 的文件地图为准（逐镜模板见 [`../references/output.md`](../references/output.md) §9）。
 
 ## 每次改规则后
 

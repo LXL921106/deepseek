@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """镜头完整性门禁 · structural_invariant 层（CNT-05 – CNT-09）
 
-对应 wan-renderer.md 的 §4 场景锚点 / §8 物理与表演 / §9 单镜模板。
+对应 references/space.md §4 §8 / references/output.md §9。
 
 判定（可阻断交付）:
   CNT-05  每个镜头都有「出场人物」，且至少一人

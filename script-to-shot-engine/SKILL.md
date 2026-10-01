@@ -3,7 +3,7 @@ name: script-to-shot-engine
 description: 基于用户已有的人物、场景、武器与道具美术资产，把打戏、动作场面或对白驱动的对峙文戏（剧本、分场、桥段）设计为动作与张力因果链，并生成简洁、去重、可直接投喂通义万相 Wan 3.0 等视频模型的单段或连续多单元提示词。适用于真人、武侠、冷兵器、枪战、玄幻、2D 动画或 3D Boss 战的打斗与追逐，也适用于多人谈判、审问、摊牌、决裂等以台词、视线和微动作推进的室内对峙场景；支持一镜到底、长篇拆段、提高动作可读性、打击感与资产连续性。不用于生成美术资产、分镜宫格或自动评价成片。
 ---
 
-# Script-to-Shot Engine v4.9.0
+# Script-to-Shot Engine v5.0.0
 
 ## 角色定位
 
@@ -20,6 +20,42 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 **判断的边界**：上面的功力用在**景别、切点、视点、光位、节奏**上。**画面里有什么人**（同人声明／锚点）和**时长够不够**（时长算式／6—15 秒）有脚本把关，**不由品味覆盖**。**提示词里不写焦距**——摄影机的功力用在决定画面，不写在参数上（`CAM-01`）。
 
 **素材边界**：输入是**剧本原文 ＋ 已上传的美术资产图**。**没有资产图就不开工**——本技能不生成美术资产，也不从零设计角色。
+
+## 文件地图（QUICK FACTS）
+
+**每个主题只有一个家。要改什么就去那个文件；其他文件只引用、不重述。**
+（教训：以前所有主题都塞在一个渲染器文件里，改了 A 节、B 节还留着旧说法——同一件事两套口径，排查出 20 多处。）
+
+| 你要做的事 | 去哪 |
+|---|---|
+| 开工第 1 步 · 平台时长 · 素材编号 · 一轮出几个单元 | [start.md](references/start.md) §0 |
+| 硬约束 · 剧本一字不改 · 参考素材引用 | [constraints.md](references/constraints.md) §1 §2 §13 |
+| 全局设置：光线、色调、声线、停顿标记 | [setup.md](references/setup.md) §3 |
+| 场景锚点 · 物理与表演 | [space.md](references/space.md) §4 §8 |
+| **先分镜后装箱 · 时长算式 · 单元合并** | [timing.md](references/timing.md) §5 |
+| 景别 · 运镜 · 切镜 · 默认已经在进行中 | [shots.md](references/shots.md) §6 |
+| 台词句式 · 节奏 · 停顿 `\|N\|` · 画外音 · 音频 | [dialogue.md](references/dialogue.md) §7 |
+| 单元结构 · 单镜头模板 · 输出顺序 · 台词回勾表 | [output.md](references/output.md) §9 §10 §11 |
+| 交付前跑什么 | [gates.md](references/gates.md) §12 |
+| 成片不对，先查这张表 | [troubleshooting.md](references/troubleshooting.md) §14 §15 |
+| 规则分级 · **冲突时听谁的** · 全部 ID 登记 | [rule-tiers.md](references/rule-tiers.md) |
+| 打戏编排 · 对峙戏 · 连续多单元（按模式加载） | [action-choreography-rules.md](references/action-choreography-rules.md) · [dialogue-scene-mode.md](references/dialogue-scene-mode.md) · [continuous-mode.md](references/continuous-mode.md) |
+
+## 主公式
+
+```text
+单元 N
+  → 摄影机头（一行英文）
+  → 一句话场景
+  → 共N镜共X秒
+  → 人物 / 场景 / 道具标记（参考图 ＋ 声线）
+  → 统一强制约束
+  → 光线 → 空间调度 → 色调 → 承接上一单元
+  → 逐镜头   ### 镜头 NN | 景别 | 运镜方式 | 机位/视角
+  → 物理 → SFX → 禁止 → 总计X秒 / N镜 / 9:16
+```
+
+**逐镜字段、模板与示例在 [output.md](references/output.md) §9 —— 本文件不重述。**
 
 ## 目标
 
@@ -58,7 +94,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ## 默认值与项目档案
 
-- 目标模型：**Wan 3.0（通义万相 3.0）**。全程按 [references/wan-renderer.md](references/wan-renderer.md) 执行。用户点了别的模型名时仍按 Wan 口径写，并在生成前提醒里说明差异（本项目只用 Wan，不维护第二套渲染器）。
+- 目标模型：**Wan 3.0（通义万相 3.0）**。全程按**上面的文件地图**逐主题执行。用户点了别的模型名时仍按 Wan 口径写，并在生成前提醒里说明差异（本项目只用 Wan，不维护第二套渲染器）。
 - 单次最长时长：用户指定，缺失 15 秒。画幅：用户指定，缺失 16:9。媒介：沿用资产描述，缺失真人写实。
 - 全局风格：由用户风格＋资产库＋题材推导为六槽位锁定词；与资产库冲突时询问，不自动覆盖。
 - 输出语言：中文；视听术语按「中文（English）」，同一 Clip 内同术语只在首次附英文。
@@ -119,11 +155,11 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
   - **人物位置引锚点；机位说相对锚点；移动写锚点路径。**
   - **禁止**"左边/右边/旁边/对面"等无参照方位词——必须写成"**锚点名 + 画左/画中/画右**"。
   - **单人镜背景不得出现其他人物**，只写空景锚点。
-  - 完整写法见 [references/wan-renderer.md](references/wan-renderer.md) §4。
+  - 完整写法见 [space.md](references/space.md) §4。
 - **每个镜头写「出场人物：…」**（单人镜只写一人）。
 - **越肩镜必写「同人声明」**：前景的〈角色名〉与画面里的〈角色名〉是同一个人、本镜只出现这一次。
   **同一角色在同一帧里只能出现一次（含前景虚化）**——实测两次翻车（两个苏晓雯、两个阿萍）都是因为没写这句。听方肩膀在前景本身就是越肩构图，要保留，靠"声明"而不是"删掉"来防重复。
-- 逐镜写：`### 镜头 NN | {景别} | {运镜方式} | {机位/视角}` ＋ `时长计算`（**字数÷语速 ＋ 表演与停顿**，向上取整到 0.5s；**语速基准：标准 4／慢 3／快 5 字/秒**——这是「朗读＋表演」的综合基准，**比模型实际发声（5.6—6.1）慢是故意的，差额留给表演，不要收紧**。**不加"口型缓冲／情绪停顿"**：4 字/秒 已含表演余量，再加就是双份静默）、场景与锚点、出场人物、道具、空间坐标、**同人声明**、画面描述、光影、色调、运镜、构图、声画同步、**台词同期**、台词、**停顿**、**台词节奏**、人声、音效、人物情绪、本镜禁止、强制约束。**不写焦距，只写景别。** 完整模板见 [references/wan-renderer.md](references/wan-renderer.md) §9。
+- **逐镜写**：标题格式 `### 镜头 NN | {景别} | {运镜方式} | {机位/视角}`；**逐镜的完整字段、模板与示例见 [output.md](references/output.md) §9 —— 本文件不重述。**
 - **台词与动作同期开始（`DIA-12`）**：`声画同步` 里排在"边说话"**之前**的动作，模型会先做完再开口——实测每镜推后 **0.73／1.50／1.74 秒**。写成「台词与〈该动作〉同时开始，**不先〈动作〉再开口**」。
 - **停顿必须写成台词里的 `|N|` 标记（`DIA-13`）**：只写"逗号后 0.3 秒"这种**描述句，模型不执行**——实测该停 0.3 秒的地方停了 **1.40 秒**，听起来像结巴。写成 `哎，|0.3|你们俩，|0.3|什么时候结婚呀？`，**钉在字上它才照做**。
 - **别把「算式语速」当演出指令（`DIA-15`）**：模型看不见 `字数÷语速` 里的那个数字，**它只看见台词行里的「语速缓慢／字字清晰」**。实测把档位从 3 提到 7/8/9，成片一点没变快——因为台词行的形容词一个字没改。**`台词节奏` 默认写"正常"，永不写"字字清晰"。**
@@ -134,7 +170,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ### 6. 渲染、去重、输出
 
-读渲染器 [references/wan-renderer.md](references/wan-renderer.md)，由它决定正文结构与输出格式。
+按**文件地图**逐主题读取；正文结构与输出格式以 [output.md](references/output.md) §10 为准。
 
 压缩顺序：① 删镜内重复摄影参数（保留各镜自己的景别与光圈）② 删镜内重复的风格与光线描述 ③ 合并同义否定约束 ④ 删没造成结果的次要敌人动作 ⑤ 合并不改变战局的动作阶段 ⑥ 删装饰性粒子、衣摆与灰尘。
 
@@ -158,7 +194,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ## 输出协议
 
-固定五个部分（Wan 3.0 时，五个部分的对应块按 [references/wan-renderer.md](references/wan-renderer.md) 的输出协议替换）：
+固定五个部分（Wan 3.0 时，五个部分的对应块按 [output.md](references/output.md) §10 的输出协议替换）：
 
 ````markdown
 ## 美术资产对照卡
@@ -181,7 +217,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 
 ## 单元 N
 
-正文按 [references/wan-renderer.md](references/wan-renderer.md) §9「单镜头模板」与 §10「输出」写：
+正文按 [output.md](references/output.md) §9「单镜头模板」与 §10「输出」写：
 
 ```text
 单元 N → 摄影机头 → 一句话场景 → 共N镜共X秒 → 人物/场景/道具 → 统一强制约束
@@ -267,7 +303,7 @@ $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\pytho
 
 **这一层不该阻断交付。** 想覆盖就直接覆盖，写一句理由。
 
-**门禁按 [references/wan-renderer.md](references/wan-renderer.md) §12 逐项核对。**
+**门禁按 [gates.md](references/gates.md) §12 逐项核对。**
 
 ## 禁止事项
 
@@ -289,6 +325,5 @@ $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\pytho
 | [references/action-choreography-rules.md](references/action-choreography-rules.md) | 动作模式，只读相关类型 |
 | [references/dialogue-scene-mode.md](references/dialogue-scene-mode.md) | 对峙模式 |
 | [references/continuous-mode.md](references/continuous-mode.md) | 连续多段 |
-| [references/wan-renderer.md](references/wan-renderer.md) | **目标模型 Wan 3.0 —— 主干，全程必读** |
 | [evaluations/README.md](evaluations/README.md) | 想知道"怎么证明改规则没有退步" |
-| [examples/](examples/) | **旧格式范例**（带逐镜时间戳与焦段）——只看结构，**写作口径一律以 wan-renderer.md 为准** |
+| [examples/](examples/) | **旧格式范例**（带逐镜时间戳与焦段）——只看结构，**写作口径一律以 SKILL.md 文件地图里的各主题文件为准** |
