@@ -480,7 +480,7 @@ def sc17():
             for ln, line in enumerate(read(os.path.join(dirpath, f)).split('\n'), 1):
                 if '单元' in line and not OK.search(line):
                     hit.append(f'{rel}:{ln} 单元')
-                if re.search(r'###\s*镜头\s*\d', line) and 'examples/' not in rel:
+                if re.search(r'###\s*镜头\s*\d', line):
                     hit.append(f'{rel}:{ln} 旧镜标题')
     return rec('SC-17', not hit,
                '交付格式只叫「组」，没有残留的「单元」或旧镜标题' if not hit

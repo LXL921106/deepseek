@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Wan 3.0 (通义万相 3.0)**
 
-![Version](https://img.shields.io/badge/version-6.4.0-blue)
+![Version](https://img.shields.io/badge/version-7.0.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -70,9 +70,7 @@ Every rule is registered in [`references/rule-tiers.md`](references/rule-tiers.m
 Deterministic checks are **scripts, not prose**:
 
 ```bash
-python scripts/check_units.py     --delivery delivery.md      # duration math · clipping · unit format
 python scripts/check_dialogue.py --script script.md --delivery delivery.md --ledger ledger.md
-python scripts/check_cast.py      --delivery delivery.md      # on-screen cast · anchors · same-person declaration
 ```
 
 [`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. [`evaluations/selfcheck.py`](evaluations/selfcheck.py) audits the skill against itself. **Script red = do not deliver.**
@@ -104,12 +102,11 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ├── references/           # On-demand rules; rule-tiers.md registers every rule's level
 ├── scripts/              # Deterministic validators (dialogue coverage, timestamps)
 ├── evaluations/          # gate.py + cases/ — regression baseline ("no regression")
-├── examples/             # Full examples (15s / 30s / 90s, action & standoff)
 └── .agents/notes/        # Decision notes (implemented / rejected / simplification)
 ```
 
 ---
 
 <div align="center">
-Current version <b>v6.4.0</b> · Wan 3.0 only — one renderer, one set of rules
+Current version <b>v7.0.0</b> · Wan 3.0 only — one renderer, one set of rules
 </div>

@@ -1,0 +1,37 @@
+{
+  "case": "06-dialogue-omission",
+  "what": "**组格式**下故意漏掉一句台词 —— 证明 check_dialogue 在主干格式上仍然咬人。",
+  "format": "group",
+  "planted_defects": [
+    "剧本第 3 句「好，让他来。奶奶给他留红烧肉。」没有出现在交付物里"
+  ],
+  "must_fire": {
+    "check_dialogue.py": [
+      "DIA-01",
+      "DIA-05"
+    ],
+    "check_groups.py": []
+  },
+  "must_not_fire": [
+    "DIA-02",
+    "DIA-03",
+    "DIA-04",
+    "AST-02",
+    "FMT-01",
+    "",
+    "CAM-04",
+    "TIM-06",
+    "AUD-04",
+    "GRP-01",
+    "GRP-02",
+    "GRP-03",
+    "GRP-04",
+    "GRP-05",
+    "DIA-16",
+    "DIA-17",
+    "CNT-08",
+    "SHT-07",
+    "SHT-08"
+  ],
+  "note": "对照 05-groups-clean（同一段戏写全）—— 两案例合起来证明 check_dialogue 在组格式上既不误报、也真的咬。"
+}

@@ -1,7 +1,7 @@
 # 交付门禁（§12）
 
 > **组格式（A 方案主线）跑 `scripts/check_groups.py`** —— 覆盖 `GRP-01`–`GRP-04`、`TIM-06`、
-> `AUD-04`、`DIA-16`／`DIA-17`、`SHT-07`／`SHT-08`、`FMT-01`／`FMT-03`、`CAM-04`。
+> `AUD-04`、`DIA-16`／`DIA-17`、`SHT-07`／`SHT-08`、`FMT-01`、`CAM-04`。
 > 实测：拿 6 组真实交付跑，**一次咬出 31 条阻断**（抢话 4 处、台词无对象、裸名 6 组、参考缺人 6 处）。
 > **这些用眼睛看不出来。**
 
@@ -11,15 +11,11 @@
 
 ```bash
 python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --ledger 台账.md
-python scripts/check_units.py     --delivery 交付物.md
-python scripts/check_cast.py      --delivery 交付物.md
 ```
 
 | 脚本 | 覆盖 |
 |---|---|
 | `check_dialogue.py` | `DIA-01..05` 漏句／残句／跨组重复／台账落点为空；`AST-02` `@名字` 指代人物 |
-| `check_units.py` | `TIM-01..05` 时长算式算术自洽、Σ镜头时长＝声明总秒数、总秒数落在 6—15、镜头编号连续 |
-| `check_cast.py` | `CNT-05..07` 出场人物与角色表一致；`CNT-08` 同人声明存在 |
 
 **红了就改，改到绿为止。**
 
@@ -30,7 +26,6 @@ python scripts/check_cast.py      --delivery 交付物.md
 - `AFX-02` 有没有无参照方位词（"左边/右边/旁边/对面"）——必须改成"锚点名+画左/画中/画右"
 - `SHT-01` 景别与内容是否匹配；有没有连着三个近景
 - `SHT-02` 每镜答得出剧情层的信息增量吗
-- `CNT-09` 越肩镜的同人声明是否成立（前景与主体不是同一人；或已声明是同一个人）
 - `TAS-01` 组时长与内容量是否相称；有没有硬凑
 
 ## 第三层 · 创作者（可覆盖，说明一句理由即可）

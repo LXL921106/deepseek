@@ -39,18 +39,13 @@ CASES = os.path.join(HERE, 'cases')
 
 CHECKERS = {
     'check_dialogue.py': ['--script', 'script.md', '--delivery', 'delivery.md', '--ledger', 'ledger.md'],
-    'check_timeline.py': ['--delivery', 'delivery.md'],
-    'check_cast.py': ['--delivery', 'delivery.md'],
-    'check_units.py': ['--delivery', 'delivery.md'],
     'check_groups.py': ['--delivery', 'delivery.md'],
 }
 
 # 每种交付格式该跑哪些检查器。**不在表里的（check_dialogue）对所有格式都跑。**
 # 这样"格式 → 检查器"的映射只有一处，不用给每个案例手写 skip_checkers。
 FORMAT_CHECKERS = {
-    'unit': {'check_units.py', 'check_cast.py'},   # 旧的「单元」格式
-    'group': {'check_groups.py'},                  # A 方案主干「组」格式
-    'clip': set(),                                 # 旧 Clip 格式：只有 check_timeline
+    'group': {'check_groups.py'},   # A 方案主干「组」格式
 }
 
 
@@ -64,8 +59,6 @@ def run_checker(script, case_dir, verbose, exp=None):
     cmd = [sys.executable, os.path.join(SCRIPTS, script)]
     for tok in CHECKERS[script]:
         cmd.append(os.path.join(case_dir, tok) if tok.endswith('.md') else tok)
-    if script == 'check_timeline.py' and exp and exp.get('clip_seconds'):
-        cmd += ['--clip-seconds', str(exp['clip_seconds'])]
     cmd.append('--json')
     try:
         p = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8', timeout=60)

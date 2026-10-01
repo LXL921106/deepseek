@@ -3,8 +3,7 @@
 """「组」格式交付物门禁（A 方案主干格式）
 
 判定（可阻断）:
-  FMT-01  不是「组 N」格式
-  FMT-03  是组格式但缺「组 N」标题行
+  FMT-01  不是「组 N」格式  是组格式但缺「组 N」标题行
   CAM-04  正文出现焦距（\\d+mm）
   TIM-06  镜数≠声明；时间戳不首尾相接；总长≠声明
   AUD-04  声音轨的说话人不在「参考」清单里
@@ -132,11 +131,17 @@ def check(text):
                                  f"只留 {gap:+.2f}s——要 ≥{MIN_REACT_GAP}s 做反应，否则抢话"})
 
         for kw in ('首帧', '尾帧', '首尾帧'):
-            if kw in text and f'组{g["no"]}' in text:
-                pass
-        if any(kw in text for kw in ('首帧', '尾帧', '首尾帧')):
-            hit = [kw for kw in ('首帧', '尾帧', '首尾帧') if kw in text]
-            B.append({'id': 'GRP-03', 'msg': f'出现不支持的写法 {hit}——本平台没有首尾帧参考'})
+            if kw in text:
+                B.append({'id': 'GRP-03', 'msg': f'出现不支持的写法「{kw}」——本平台没有首尾帧参考'})
+                break
+
+        # CNT-08 越肩／带前景的镜必须写同人声明（防"画面里多出一个人"）
+        for s in sh:
+            hb = s['head'] + s['body']
+            if re.search(r'越肩|前景', hb) and '同人声明' not in hb and '只出现这一次' not in hb:
+                B.append({'id': 'CNT-08',
+                          'msg': f"{tag} 镜{s['n']} 是越肩／带前景的镜，但没写「同人声明」——"
+                                 f'前景的人就是画面里的人，只出现这一次'})
 
         # GRP-01 / GRP-02
         for label in ('start', 'end'):

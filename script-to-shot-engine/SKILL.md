@@ -3,7 +3,7 @@ name: script-to-shot-engine
 description: 基于用户已有的人物、场景、武器与道具美术资产，把打戏、动作场面或对白驱动的对峙文戏（剧本、分场、桥段）设计为动作与张力因果链，并生成简洁、去重、可直接投喂通义万相 Wan 3.0 等视频模型的单组或连续多组提示词。适用于真人、武侠、冷兵器、枪战、玄幻、2D 动画或 3D Boss 战的打斗与追逐，也适用于多人谈判、审问、摊牌、决裂等以台词、视线和微动作推进的室内对峙场景；支持一镜到底、长篇拆段、提高动作可读性、打击感与资产连续性。不用于生成美术资产、分镜宫格或自动评价成片。
 ---
 
-# Script-to-Shot Engine v6.4.0
+# Script-to-Shot Engine v7.0.0
 
 ## 角色定位
 
@@ -24,7 +24,6 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 ## 文件地图（QUICK FACTS）
 
 **每个主题只有一个家。要改什么就去那个文件；其他文件只引用、不重述。**
-（教训：以前所有主题都塞在一个渲染器文件里，改了 A 节、B 节还留着旧说法——同一件事两套口径，排查出 20 多处。）
 
 | 你要做的事 | 去哪 |
 |---|---|
@@ -55,7 +54,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
   结束        人·物·位置·手在干什么
 ```
 
-**完整模板、字段定义与硬约束见 [group-format.md](references/group-format.md) —— 本文件不重述。**
+**完整模板、字段定义与硬约束见 [group-format.md](references/group-format.md)**
 
 ## 目标
 
@@ -159,7 +158,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 - **每个镜头写「出场人物：…」**（单人镜只写一人）。
 - **越肩镜必写「同人声明」**：前景的〈角色名〉与画面里的〈角色名〉是同一个人、本镜只出现这一次。
   **同一角色在同一帧里只能出现一次（含前景虚化）**——实测两次翻车（两个苏晓雯、两个阿萍）都是因为没写这句。听方肩膀在前景本身就是越肩构图，要保留，靠"声明"而不是"删掉"来防重复。
-- **逐镜写**：每镜只有**两行** —— `镜N｜{起}—{止}s｜{景别}，{机位}：{可见动作}。结束：{末态}` 与 `声音｜{起}—{止}s｜现场/画外｜{说话人}（看向{对象}，{语气}）："{原文}"`。**完整模板与字段见 [group-format.md](references/group-format.md)；这两行容易写错的地方见 [output.md](references/output.md) §9 —— 本文件不重述。**
+- **逐镜写**：每镜只有**两行** —— `镜N｜{起}—{止}s｜{景别}，{机位}：{可见动作}。结束：{末态}` 与 `声音｜{起}—{止}s｜现场/画外｜{说话人}（看向{对象}，{语气}）："{原文}"`。**完整模板与字段见 [group-format.md](references/group-format.md)；这两行容易写错的地方见 [output.md](references/output.md) §9**
 - **台词与动作同期开始（`DIA-12`）**：**只适用于说话人自己的动作**（坐下／起身／递物）——排在"边说话"之前的那些动作，模型会先做完再开口（实测每镜推后 **0.73／1.50／1.74 秒**）。**对别人的反应相反**：听到 → 看向 → 对视 → **才开口**，必须排在前面，并用 ≥0.5s 的反应空档承载（`DIA-17`，见 [dialogue.md](references/dialogue.md) §7）。
 - **停顿必须写成台词里的 `|N|` 标记（`DIA-13`）**：只写"逗号后 0.3 秒"这种**描述句，模型不执行**——实测该停 0.3 秒的地方停了 **1.40 秒**，听起来像结巴。写成 `哎，|0.3|你们俩，|0.3|什么时候结婚呀？`，**钉在字上它才照做**。
 - **别把「算式语速」当演出指令（`DIA-15`）**：模型看不见 `字数÷语速` 里的那个数字，**它只看见台词行里的「语速缓慢／字字清晰」**。实测把档位从 3 提到 7/8/9，成片一点没变快——因为台词行的形容词一个字没改。**`台词节奏` 默认写"正常"，永不写"字字清晰"。**
@@ -230,7 +229,7 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
   结束        人·物·位置·手在干什么
 ```
 
-**字段定义与硬约束见 [group-format.md](references/group-format.md) —— 本文件不重述。**
+**字段定义与硬约束见 [group-format.md](references/group-format.md)**
 
 ## 生成前提醒
 
@@ -261,17 +260,14 @@ description: 基于用户已有的人物、场景、武器与道具美术资产�
 ### 第一层 · 脚本（可阻断——红了不得交付）
 
 ```bash
-python scripts/check_units.py     --delivery 交付物.md      # 时长算式 · 装箱 · 单元格式
+python scripts/check_groups.py   --delivery 交付物.md      # 组格式 · 时间戳 · 参考覆盖 · 反应拍
 python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --ledger 台账.md
-python scripts/check_cast.py      --delivery 交付物.md      # 出场人物 · 锚点 · 同人声明
 ```
 
-覆盖 `TIM-01..05`（时长算式自洽、Σ镜头＝声明总秒数、6—15 秒区间）、`DIA-01..05`、`AST-02`、`CNT-05..09`、`FMT-01`／`FMT-03`（格式守卫）、`CAM-04`（不得出现焦距）。**红了就改，改到绿为止。**
+覆盖 `TIM-06`（时长算式自洽、Σ镜头＝声明总秒数、6—15 秒区间）、`DIA-01..05`、`AST-02`、`CNT-08`、`FMT-01`（格式守卫）、`CAM-04`（不得出现焦距）。**红了就改，改到绿为止。**
 
-**`FMT-01` 格式守卫**：交付物既不是「组 N」也不是旧的「单元 N」「### Clip NN」时，脚本**直接报错**，不静默通过。
-> 教训：`check_timeline.py` 曾因找不到 `### Clip NN` 而一个分镜都没读到，把一份漏了 6 秒的提示词判成"通过"。**"读不到内容"必须和"内容没问题"区分开。**
+**`FMT-01` 格式守卫**：交付物不是「组 N」格式时，脚本**直接报错**，不静默通过。
 
-**`check_timeline.py` 不在主线上**——新格式的时长由「时长计算」推导，由 `check_units.py` 承担；它只为**历史旧格式交付**保留。
 
 `--clip-seconds` 填这一段平台单次生成的秒数；**填了才查得出"末镜短于 Clip 时长"**（多出来的那段时间会变成无声空白）。
 
@@ -283,7 +279,6 @@ python scripts/check_cast.py      --delivery 交付物.md      # 出场人物 ·
 $skill = Join-Path $env:USERPROFILE '.dsh\skills\script-to-shot-engine'
 $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\python\python.exe" | Select-Object -First 1).FullName
 & $py "$skill\scripts\check_dialogue.py" --script 剧本.md --delivery 交付物.md --ledger 台账.md
-& $py "$skill\scripts\check_timeline.py"  --delivery 交付物.md
 ```
 
 脚本只读文件、不写任何文件。**退出码 0 = 通过，1 = 有阻断项，2 = 用法或读取错误。** 加 `--json` 拿结构化结果。
@@ -328,4 +323,3 @@ $py    = (Get-ChildItem "$env:USERPROFILE\.dsh\dsh-runtimes\*\dependencies\pytho
 | [references/dialogue-scene-mode.md](references/dialogue-scene-mode.md) | 对峙模式 |
 | [references/continuous-mode.md](references/continuous-mode.md) | 连续多段 |
 | [evaluations/README.md](evaluations/README.md) | 想知道"怎么证明改规则没有退步" |
-| [examples/](examples/) | **旧格式范例**（带逐镜时间戳与焦段）——只看结构，**写作口径一律以 SKILL.md 文件地图里的各主题文件为准** |

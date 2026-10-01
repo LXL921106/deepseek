@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂万相 3.0（Wan 3.0）的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-6.4.0-blue)
+![Version](https://img.shields.io/badge/version-7.0.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Lang](https://img.shields.io/badge/提示词-中文-green)
@@ -68,9 +68,7 @@
 确定性检查是**脚本，不是散文**：
 
 ```bash
-python scripts/check_units.py     --delivery 交付物.md      # 时长算式 · 装箱 · 单元格式
 python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --ledger 台账.md
-python scripts/check_cast.py      --delivery 交付物.md      # 出场人物 · 锚点 · 同人声明
 ```
 
 [`evaluations/gate.py`](evaluations/gate.py) 回放 `evaluations/cases/` 里的夹具，守卫不再咬人或开始误报就红。[`evaluations/selfcheck.py`](evaluations/selfcheck.py) 让技能**对照自己**体检。**脚本红了不得交付。**
@@ -102,12 +100,11 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ├── references/           # 按需加载的规则；rule-tiers.md 登记每条规则的级别
 ├── scripts/              # 确定性校验器（台词覆盖、时间戳）
 ├── evaluations/          # gate.py + cases/ —— 回归基准（判定"没有退步"）
-├── examples/             # 打戏与对峙完整示例（15s / 30s / 90s）
 └── .agents/notes/        # 决策笔记（implemented / rejected / simplification）
 ```
 
 ---
 
 <div align="center">
-当前版本 <b>v6.4.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
+当前版本 <b>v7.0.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
 </div>
