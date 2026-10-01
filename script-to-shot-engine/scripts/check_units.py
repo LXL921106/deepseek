@@ -43,6 +43,7 @@ _EQ_END = re.compile(r'=\s*([\d.]+)\s*s')
 _DIV = re.compile(r'(\d+)\s*字\s*÷\s*(\d+)\s*=\s*([\d.]+)\s*s')
 _APPROX = re.compile(r'≈\s*([\d.]+)\s*s')
 _BUF = re.compile(r'(?:口型)?缓冲(?:\s*情绪)?\s*([\d.]+)\s*s')
+_BUF_PARTS = re.compile(r'缓冲\s*([\d.]+)\s*s?\s*[（(]\s*标点停顿\s*([\d.]+)\s*[＋+]\s*([\d.]+)\s*余量')
 _REACT = re.compile(r'反应(?:镜头)?\s*([\d.]+)\s*s')
 _ACTION = re.compile(r'动作步长\s*([\d.]+)\s*s')
 _EMO = re.compile(r'情绪\s*([\d.]+)\s*s')
@@ -180,6 +181,19 @@ def check(units, has_unit=True, has_clip=False):
                     blockers.append({'id': 'TIM-05',
                                      'msg': f'{tag} 镜头 {s["n"]:02d}：{s["approx"]}s + 缓冲{s["buf"]}s '
                                             f'= {calc}s，与写出的 {s["dur"]}s 不符'})
+
+            # TIM-05 之二：括号里拆出来的缓冲，加起来必须等于写出来的缓冲。
+            # 实测教训：写「缓冲2.0s（标点停顿1.1＋0.5余量）」，1.1＋0.5 只有 1.6——
+            # 多出的 0.4s 不会被念出来，只会变成静默。
+            bp = _BUF_PARTS.search(s.get('raw') or '')
+            if bp:
+                stated, pause, margin = float(bp.group(1)), float(bp.group(2)), float(bp.group(3))
+                if abs(stated - (pause + margin)) > 1e-6:
+                    over = round(stated - (pause + margin), 2)
+                    blockers.append({'id': 'TIM-05',
+                                     'msg': f'{tag} 镜头 {s["n"]:02d}：写「缓冲{stated}s」，但括号里 '
+                                            f'{pause}＋{margin}={round(pause + margin, 2)}s——'
+                                            f'多出的 {over}s 念不出来，只会变成静默'})
         # 数字对账
         total = sum(s['dur'] for s in shots if s['dur'] is not None)
         if u['decl_total'] is not None and shots:
