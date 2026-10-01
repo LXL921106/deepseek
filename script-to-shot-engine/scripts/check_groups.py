@@ -158,6 +158,15 @@ def check(text):
                           'msg': f'{tag} 用了裸名「{bare}」——应为带状态的「{full}」'})
 
         # 提示级
+        anchors = re.findall(r'（([^）]*)）', g['ref'] or '')
+        body_all = '\n'.join([g['start'] or '', g['end'] or '',
+                              *[s['head'] + s['body'] for s in sh]])
+        for word in ('盒', '包装', '袋', '瓶', '罐'):
+            if word in body_all and not any(word in a for a in anchors):
+                W.append({'id': 'GRP-05',
+                          'msg': f'{tag} 正文出现「{word}」，但「参考」的资产锚点里没有——'
+                                 f'一张资产图常同时含主件与包装，可能漏写了'})
+                break
         for s in sh:
             if '对视' in s['body'] and not re.search(r'双人|两人|同框|中景|全景', s['head'] + s['body']):
                 W.append({'id': 'SHT-07',

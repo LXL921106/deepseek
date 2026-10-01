@@ -10,7 +10,7 @@
   "must_not_fire": [
     "FMT-01", "FMT-03", "CAM-04",
     "TIM-06", "AUD-04",
-    "GRP-01", "GRP-02", "GRP-03", "GRP-04",
+    "GRP-01", "GRP-02", "GRP-03", "GRP-04", "GRP-05",
     "DIA-16", "DIA-17",
     "SHT-07", "SHT-08"
   ],

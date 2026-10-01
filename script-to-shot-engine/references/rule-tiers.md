@@ -56,6 +56,7 @@
 | `SHT-07` | 写了「对视」的镜，景别必须双人（单人镜拍不到对视） | 提示 |
 | `SHT-08` | 镜1 必须写明画面主体（否则 `起始` 段会泄漏成镜1 画面） | 提示 |
 | `GRP-04` | 跨组状态链：上一组「结束」的人 ∩ 本组「起始」的人 ≠ ∅ | 提示 |
+| `GRP-05` | 资产锚点覆盖图里全部会入画的部件（一张图常同时含主件与包装） | 提示 |
 | `PRJ-01` | 项目档案中创作者已接受的值（如「开场用可见画面」「无背景音乐」）在交付物中被满足 | 值比对 ｜ **待实现——尚无脚本** |
 | `CNT-05` | 锚点清单＋人物初始位置齐备；角色名不重复、不出现未登记的人 | 解析＋集合比对 |
 | `CNT-06` | 每个镜头写「出场人物：…」，且必须是本组「人物：」行登记过的角色 | 逐镜集合比对 |
@@ -166,7 +167,7 @@
 
 | 脚本 | 覆盖 | 线路 | 用法 |
 |---|---|---|---|
-| `scripts/check_groups.py` | `GRP-01`–`GRP-04`、`TIM-06`、`AUD-04`、`DIA-16`／`DIA-17`、`SHT-07`／`SHT-08`、`FMT-01`／`FMT-03`、`CAM-04` | **组格式（A 方案主线）** | `python check_groups.py --delivery 交付物.md` |
+| `scripts/check_groups.py` | `GRP-01`–`GRP-05`、`TIM-06`、`AUD-04`、`DIA-16`／`DIA-17`、`SHT-07`／`SHT-08`、`FMT-01`／`FMT-03`、`CAM-04` | **组格式（A 方案主线）** | `python check_groups.py --delivery 交付物.md` |
 | `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01`／`FMT-03` | **旧的「单元」格式（过渡期保留）** | `python check_units.py --delivery 交付物.md` |
 | `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01`／`FMT-03` | **旧的「单元」格式（过渡期保留）** | `python check_cast.py --delivery 交付物.md` |
 | `scripts/check_dialogue.py` | `DIA-01`–`DIA-05`、`AST-02` | **两条线通用** | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
