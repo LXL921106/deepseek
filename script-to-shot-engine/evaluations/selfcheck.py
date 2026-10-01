@@ -292,12 +292,36 @@ def sc11():
                f'{len(seen)} 个规则 ID 无重复定义' if not dup else f'ID 撞号：{dup}')
 
 
+def sc12():
+    """模板里不该再出现被禁的节奏写法。
+
+    教训：`DIA-15` 说"永不写字字清晰"，而 §6.1 的台词句式表里**每一行都带着它**——
+    改了规则没扫载体，模型照模板写，规则等于没改。
+    """
+    files = ('SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+             'references/pre-shot-checklist.md', 'templates/project/01-档案/项目档案.md')
+    okmark = ('不要', '永不', '禁止', '✗', '教训')
+    hit = []
+    for f in files:
+        p = os.path.join(ROOT, f)
+        if not os.path.isfile(p):
+            continue
+        for ln, line in enumerate(read(p).splitlines(), 1):
+            # 出现在「」里的算**引用**（解释为什么禁），不算教写；模板是把它们裸写的
+            bare = re.sub(r'「[^」]*」', '', line)
+            for bad in ('字字清晰', '语速缓慢'):
+                if bad in bare and not any(k in line for k in okmark):
+                    hit.append(f'{f}:{ln} 「{bad}」')
+    return rec('SC-12', not hit,
+               '模板里没有残留被禁的节奏写法' if not hit else f'仍在教写：{hit[:6]}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来

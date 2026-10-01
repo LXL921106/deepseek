@@ -3,7 +3,7 @@
 ARRI ALEXA 35, f/2.8, shallow depth of field, natural light, 4000K, photorealistic, high detail texture, film grain, professional color grading. 9:16竖屏。
 一句话场景：上午的老式客厅<Picture 4>，沈志远<Picture 2> 刚进门，林秀兰<Picture 1> 坐着摘菜抬头看他。
 共3镜共6秒
-人物：@沈志远<Picture 2>（声线：浑厚青年男音，语速中偏快）、@林秀兰<Picture 1>（声线：温和沙哑中老年女音，语速缓慢）
+人物：@沈志远<Picture 2>（声线：浑厚青年男音）、@林秀兰<Picture 1>（声线：温和沙哑中老年女音）
 场景：客厅<Picture 4>（锚点：深色防盗门位于画左，餐桌位于画中，米灰沙发位于画右）
 道具：菜篮
 统一强制约束：9:16竖屏原生不裁切｜严禁BGM｜严禁字幕｜严禁穿模｜严禁乱码｜有台词时口齿清晰｜同一角色同一帧只出现一次。
@@ -28,7 +28,7 @@ ARRI ALEXA 35, f/2.8, shallow depth of field, natural light, 4000K, photorealist
 声画同步：
 
 镜头1（近景，2.0秒）：沈志远肩膀起伏，边开口边看向画左，嘴部动作明显。
-台词：沈志远看向林秀兰（语速中偏快，字字清晰）：「我回来了。」
+台词：沈志远看向林秀兰（正常）：「我回来了。」
 台词字数约：5字
 人声：进门的喘息声。
 音效：客厅环境底噪、挂钟走针声。
@@ -76,7 +76,7 @@ ARRI ALEXA 35, f/2.8, shallow depth of field, natural light, 4000K, photorealist
 声画同步：
 
 镜头1（近景，2.5秒）：林秀兰边说话边看向画右，手指捏住菜，嘴部动作明显。
-台词：林秀兰看向沈志远（语速缓慢，字字清晰）：「你们回来干什么？」
+台词：林秀兰看向沈志远（正常）：「你们回来干什么？」
 台词字数约：8字
 人声：无
 音效：客厅环境底噪、菜叶轻响。
