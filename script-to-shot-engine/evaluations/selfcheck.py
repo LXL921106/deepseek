@@ -448,13 +448,46 @@ def sc16():
                else f'引用指空：{["§" + x for x in undef]}')
 
 
+def sc17():
+    """交付格式只能叫「组」——不得再出现格式含义的「单元」。
+
+    教训：v6.0.0 换主干（组格式）时**只写了新家**，旧家 14 个文件还留着「单元」——
+    主公式说「组」、下面的工作流说「单元」。**又变成两套口径。**
+
+    白名单（不是格式含义，合法保留）：
+      · 攻防单元／动作单元／张力单元 —— 编排单位，与交付格式无关
+      · 单元测试 —— 测试术语
+      · 夹具、旧检查器代码、`.agents/` 决策笔记
+      · 明确标注的过渡／历史实测记录
+    """
+    OK = re.compile(r'攻防单元|动作单元|张力单元|单元测试|单元11|单元 11|单元01|单元 01'
+                    r'|单元\s*N|单元格式|单元门禁|单元标题|单元上限|旧的|过渡|已废弃'
+                    r'|只输出 1 个单元|下一单元从|第一个单元')
+    SKIP = ('evaluations/cases/', '.agents/', 'evaluations/gate.py')
+    hit = []
+    for dirpath, dirs, files in os.walk(ROOT):
+        dirs[:] = [d for d in dirs if d not in ('.git', '.push-deepseek')]
+        for f in sorted(files):
+            if not f.endswith('.md'):
+                continue
+            rel = os.path.relpath(os.path.join(dirpath, f), ROOT).replace('\\', '/')
+            if any(rel.startswith(s) for s in SKIP):
+                continue
+            for ln, line in enumerate(read(os.path.join(dirpath, f)).split('\n'), 1):
+                if '单元' in line and not OK.search(line):
+                    hit.append(f'{rel}:{ln}')
+    return rec('SC-17', not hit,
+               '交付格式只叫「组」，没有残留的「单元」' if not hit
+               else f'仍把交付格式叫「单元」：{hit[:6]}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
     for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12,
-               sc13, sc14, sc15, sc16):
+               sc13, sc14, sc15, sc16, sc17):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来

@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Wan 3.0 (通义万相 3.0)**
 
-![Version](https://img.shields.io/badge/version-6.0.0-blue)
+![Version](https://img.shields.io/badge/version-6.1.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -77,7 +77,7 @@ python scripts/check_cast.py      --delivery delivery.md      # on-screen cast �
 
 [`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. [`evaluations/selfcheck.py`](evaluations/selfcheck.py) audits the skill against itself. **Script red = do not deliver.**
 
-> `FMT-01` **format guard**: a delivery that is neither the `单元 N` format nor the legacy `### Clip NN` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
+> `FMT-01` **format guard**: a delivery that is neither the `组 N` format nor the legacy `单元 N` / `### Clip NN` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
 
 Why: prose checklists cannot distinguish "I checked" from "I actually checked". A dropped half-line looks identical to a complete one.
 
@@ -111,5 +111,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v6.0.0</b> · Wan 3.0 only — one renderer, one set of rules
+Current version <b>v6.1.0</b> · Wan 3.0 only — one renderer, one set of rules
 </div>
