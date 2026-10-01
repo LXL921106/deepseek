@@ -12,7 +12,7 @@
   "must_fire": {
     "check_dialogue.py": [],
     "check_timeline.py": ["TIM-04"],
-    "check_units.py": ["FMT-01"]
+    "check_units.py": ["FMT-01", "CAM-04"]
   },
   "must_not_fire": ["DIA-01", "DIA-02", "DIA-03", "DIA-04", "DIA-05", "AST-02", "TIM-01", "TIM-02", "TIM-03"],
   "why_this_case_exists": "两个理由：① 合成夹具里每一份都带 `### Clip NN` 标题——真实交付没有，第一个真实输入就撞出了 check_timeline 的假阴性；② **它是 FMT-01 格式守卫的验收案例**——旧格式必须被明确报错，而不是被 check_units 静默跳过。",

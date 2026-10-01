@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Wan 3.0 (通义万相 3.0)**
 
-![Version](https://img.shields.io/badge/version-4.8.1-blue)
+![Version](https://img.shields.io/badge/version-4.9.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -111,5 +111,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v4.8.1</b> · Wan 3.0 only — one renderer, one set of rules
+Current version <b>v4.9.0</b> · Wan 3.0 only — one renderer, one set of rules
 </div>

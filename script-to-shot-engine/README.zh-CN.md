@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂万相 3.0（Wan 3.0）的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-4.8.1-blue)
+![Version](https://img.shields.io/badge/version-4.9.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Lang](https://img.shields.io/badge/提示词-中文-green)
@@ -109,5 +109,5 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ---
 
 <div align="center">
-当前版本 <b>v4.8.1</b> · 只做万相 3.0 —— 一套渲染器、一套规则
+当前版本 <b>v4.9.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
 </div>

@@ -37,7 +37,7 @@ _UNIT = re.compile(r'^#*\s*单元\s*(\d+)')
 _CLIP_LEGACY = re.compile(r'^#{2,4}\s*Clip\s*0*\d+', re.IGNORECASE)
 _TOTAL_DECL = re.compile(r'共\s*(\d+)\s*镜共\s*([\d.]+)\s*秒')
 _SUM_DECL = re.compile(r'总计[：:]\s*([\d.]+)\s*秒')
-_SHOT = re.compile(r'^#*\s*镜头\s*(\d+)\s*[|｜]')
+_SHOT = re.compile(r'^#*\s*镜头\s*(\d+)\s*[|｜]\s*(.*)$')
 _DUR = re.compile(r'\*{0,2}时长计算\*{0,2}\s*[：:]\s*(.+)')
 _EQ_END = re.compile(r'=\s*([\d.]+)\s*s')
 _DIV = re.compile(r'(\d+)\s*字\s*÷\s*(\d+)\s*=\s*([\d.]+)\s*s')
@@ -87,7 +87,8 @@ def parse(text):
             cur['sum_total'] = float(m.group(1))
         m = _SHOT.match(raw)
         if m:
-            cur['shots'].append({'n': int(m.group(1)), 'lineno': i + 1, 'dur': None,
+            cur['shots'].append({'n': int(m.group(1)), 'lineno': i + 1,
+                                 'head': (m.group(2) or '').strip(), 'dur': None,
                                  'div': None, 'approx': None, 'buf': None,
                                  'react': None, 'action': None})
             continue
@@ -206,6 +207,19 @@ def check(units, has_unit=True, has_clip=False, raw=''):
                                      'msg': f'{tag} 镜头 {s["n"]:02d}：写「加数{stated}s」，但括号里 '
                                             f'{pause}＋{margin}={round(pause + margin, 2)}s——'
                                             f'多出的 {over}s 念不出来，只会变成静默'})
+        # SHT-05 双对比切镜（**只提示，不阻断**）：相邻镜头不该景别和运镜都没变
+        hd = [re.split(r'[|｜]', s['head']) for s in shots]
+        for i in range(1, len(shots)):
+            if len(hd[i]) < 2 or len(hd[i - 1]) < 2:
+                continue
+            size_a, size_b = hd[i - 1][0].strip(), hd[i][0].strip()
+            move_a, move_b = hd[i - 1][1].strip(), hd[i][1].strip()
+            if size_a == size_b and move_a == move_b:
+                warnings.append({'id': 'SHT-05',
+                                 'msg': f'{tag} 镜头 {shots[i-1]["n"]:02d}→{shots[i]["n"]:02d} '
+                                        f'景别和运镜都没变（{size_b}｜{move_b}）——'
+                                        f'双对比切镜要求至少换一项'})
+
         # 数字对账
         total = sum(s['dur'] for s in shots if s['dur'] is not None)
         if u['decl_total'] is not None and shots:
