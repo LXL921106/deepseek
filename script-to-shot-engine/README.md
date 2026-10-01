@@ -6,7 +6,7 @@
 
 **Turn scripts into shot-by-shot video prompts, ready to feed Wan 3.0 (通义万相 3.0)**
 
-![Version](https://img.shields.io/badge/version-7.0.0-blue)
+![Version](https://img.shields.io/badge/version-7.1.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-supported-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Prompts](https://img.shields.io/badge/prompts-Chinese-green)
@@ -39,7 +39,7 @@ Prompts are generated in Chinese by design — Wan 3.0 handles them best that wa
 | **Shot density** | ≥10 shots per 15s, 1–2s each | 5–8 shots per 15s, 2–4s each |
 | **Dialogue** | Incidental | Full script lines embedded in shots; one line per shot by default, audio-bridged across shots when the picture must leave the speaker |
 
-Mixed scenes (talk first, fight later) can **switch modes clip by clip**.
+Mixed scenes (talk first, fight later) can **switch modes group by group**.
 
 ## 📦 Output structure
 
@@ -47,14 +47,14 @@ Mixed scenes (talk first, fight later) can **switch modes clip by clip**.
 ## Asset Reference Card      ← @asset names + short anchors; inferred looks auto-flagged
 ## Global Style Lock         ← six-slot style lock, emitted once for the whole film
 ## Dialogue Coverage Ledger  ← one row per script line: full original string + landing shot + status
-## Video Generation Prompts  ← per clip: spatial setup → shots (seamless timestamps) → end state → constraints
+## Video Generation Prompts  ← per 组: spatial setup → shots (seamless timestamps) → end state → constraints
 ## Pre-flight Notes          ← up to three honest warnings
 ```
 
 - ⏱ **Closed-loop timestamps**: every shot carries start–end seconds, aperture `f/2.8` with a depth-of-field note, and a **shot size** — no focal length (`CAM-01`: writing both a size word and a mm value makes the model relax to the looser one)
-- 🔗 **Long-scene splitting**: split at completed action/turning points; characters, weapons, seats, blood states carry across clips
+- 🔗 **Long-scene splitting**: split at completed action/turning points; characters, weapons, seats, blood states carry across groups
 - 🎭 **Special stylization**: flashbacks, CCTV, hallucinations can be layered onto marked segments without polluting the global lock
-- 🧷 **Asset continuity**: weapon hand, downed bodies, extinguished light sources — tracked across clips
+- 🧷 **Asset continuity**: weapon hand, downed bodies, extinguished light sources — tracked across groups
 
 ## 🧪 Rules and gate (new in v3.0.0)
 
@@ -75,7 +75,7 @@ python scripts/check_dialogue.py --script script.md --delivery delivery.md --led
 
 [`evaluations/gate.py`](evaluations/gate.py) replays the fixtures in `evaluations/cases/` and fails if a guard stops biting or starts false-positiving. [`evaluations/selfcheck.py`](evaluations/selfcheck.py) audits the skill against itself. **Script red = do not deliver.**
 
-> `FMT-01` **format guard**: a delivery that is neither the `组 N` format nor the legacy `单元 N` / `### Clip NN` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
+> `FMT-01` **format guard**: a delivery that is neither the `组 N` format nor the legacy `单元 N` / `组 N` format makes the checkers **error out instead of silently passing**. Lesson: the old timeline checker once read zero shots from a real delivery and waved through a prompt missing 6 seconds — **"couldn't read it" must never look like "it's fine"**.
 
 Why: prose checklists cannot distinguish "I checked" from "I actually checked". A dropped half-line looks identical to a complete one.
 
@@ -108,5 +108,5 @@ Or download the ZIP and extract it into your skills directory. Then just say **"
 ---
 
 <div align="center">
-Current version <b>v7.0.0</b> · Wan 3.0 only — one renderer, one set of rules
+Current version <b>v7.1.0</b> · Wan 3.0 only — one renderer, one set of rules
 </div>

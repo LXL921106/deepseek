@@ -7,7 +7,7 @@
   DIA-01  剧本每句台词（去标点后逐字）必须出现在交付正文中，允许被拆到多个分镜后按顺序拼接还原
   DIA-02  被拆开的台词，各段在同一说话人的台词流中必须连续，中间不得夹该说话人的其他台词
   DIA-03  以逗号／破折号结尾的台词段是残句：它的后半句必须真的接上
-  DIA-04  同一句台词不得出现在两个不同的 Clip
+  DIA-04  同一句台词不得出现在两个不同的组
   DIA-05  台账「落点」列不得为空（提供 --ledger 时校验）
   AST-02  正文台词不得用 `@名字` 指代人物（应写人物名）
 
@@ -45,8 +45,9 @@ def norm(s):
     return _PUNCT.sub('', s or '')
 
 
-# ---------- Clip 边界 ----------
-_CLIP = re.compile(r'^#{2,4}\s*Clip\s*0*(\d+)\b', re.IGNORECASE)
+# ---------- 组边界 ----------
+# 组格式的标题是 `组12｜原文范围：…`；旧的 `### Clip NN` 也认（历史产物仍要能审）
+_CLIP = re.compile(r'^(?:#{2,4}\s*)?(?:组|Clip)\s*0*(\d+)', re.IGNORECASE | re.MULTILINE)
 
 
 def clip_index_at(lines, upto):
@@ -138,7 +139,7 @@ def check(script_txt, deliv_txt, ledger_txt):
     # AST-02
     for d in delivery:
         if d['at']:
-            blockers.append({'id': 'AST-02', 'msg': f'Clip {d["clip"]} 第 {d["lineno"]} 行台词用 `@{d["who"]}` 指代人物，正文应写人物名'})
+            blockers.append({'id': 'AST-02', 'msg': f'组{d["clip"]} 第 {d["lineno"]} 行台词用 `@{d["who"]}` 指代人物，正文应写人物名'})
 
     # DIA-05 台账落点
     if ledger_txt is not None:
@@ -199,7 +200,7 @@ def check(script_txt, deliv_txt, ledger_txt):
                 between = [d for d in delivery if l1 < d['lineno'] < lk and d['who'] != who]
                 clips = sorted({segs[i]['clip'] for i in covered})
                 if len(clips) > 1:
-                    info.append(f'跨 Clip 接续：{who}「{s["text"][:16]}…」→ Clip {"→".join(map(str, clips))}（请审查者确认紧邻，DIA-06）')
+                    info.append(f'跨组接续：{who}「{s["text"][:16]}…」→ 组{"→".join(map(str, clips))}（请审查者确认紧邻，DIA-06）')
                 if between:
                     warnings.append({'id': 'DIA-06',
                                      'msg': f'{who} 的台词「{s["text"][:18]}…」被拆开，两段之间夹了其他角色 '
@@ -221,11 +222,11 @@ def check(script_txt, deliv_txt, ledger_txt):
                 if s['norm'].startswith(frag) and s['norm'] != frag and s['norm'] not in joined:
                     missed = s['text'][len(tail.rstrip('，,、—')):].lstrip('，,、—')
                     blockers.append({'id': 'DIA-03', 'who': who, 'line_no': s['line_no'],
-                                     'msg': f'残句：Clip {seg["clip"]} 第 {seg["lineno"]} 行以「{tail[-6:]}」结尾，'
+                                     'msg': f'残句：组{seg["clip"]} 第 {seg["lineno"]} 行以「{tail[-6:]}」结尾，'
                                             f'后半句「{missed[:24]}」没有接续（剧本第 {s["line_no"]} 行）'})
                     break
 
-    # DIA-04 跨 Clip 重复
+    # DIA-04 跨组重复
     seen = {}
     for d in delivery:
         k = norm(d['text'])
@@ -234,7 +235,7 @@ def check(script_txt, deliv_txt, ledger_txt):
     for k, ds in seen.items():
         clips = sorted({d['clip'] for d in ds})
         if len(clips) > 1:
-            blockers.append({'id': 'DIA-04', 'msg': f'同一句台词出现在多个 Clip（{clips}）：「{ds[0]["text"][:24]}…」'})
+            blockers.append({'id': 'DIA-04', 'msg': f'同一句台词出现在多个组（{clips}）：「{ds[0]["text"][:24]}…」'})
 
     return {'blockers': blockers, 'warnings': warnings, 'info': info,
             'fired': sorted({b['id'] for b in blockers}),

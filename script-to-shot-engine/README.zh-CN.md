@@ -6,7 +6,7 @@
 
 **把剧本变成可直接投喂万相 3.0（Wan 3.0）的逐镜头视频提示词**
 
-![Version](https://img.shields.io/badge/version-7.0.0-blue)
+![Version](https://img.shields.io/badge/version-7.1.0-blue)
 ![Model](https://img.shields.io/badge/Wan_3.0-支持-blueviolet)
 ![Type](https://img.shields.io/badge/Skill-black)
 ![Lang](https://img.shields.io/badge/提示词-中文-green)
@@ -73,7 +73,7 @@ python scripts/check_dialogue.py --script 剧本.md --delivery 交付物.md --le
 
 [`evaluations/gate.py`](evaluations/gate.py) 回放 `evaluations/cases/` 里的夹具，守卫不再咬人或开始误报就红。[`evaluations/selfcheck.py`](evaluations/selfcheck.py) 让技能**对照自己**体检。**脚本红了不得交付。**
 
-> **`FMT-01` 格式守卫**：交付物既不是「组 N」也不是旧的「单元 N」／「### Clip NN」时，检查器**直接报错，不静默通过**。教训：旧的 timeline 检查器曾在真实交付上读到 0 个分镜，把一份漏了 6 秒的提示词判成通过——**"读不到"绝不能长得像"没问题"**。
+> **`FMT-01` 格式守卫**：交付物既不是「组 N」也不是旧的「单元 N」／「组 N」时，检查器**直接报错，不静默通过**。教训：旧的 timeline 检查器曾在真实交付上读到 0 个分镜，把一份漏了 6 秒的提示词判成通过——**"读不到"绝不能长得像"没问题"**。
 
 为什么：散文清单分不清「我检查过了」和「我真的核对了」——漏掉的半句和完整的句子，看上去一模一样。
 
@@ -106,5 +106,5 @@ git clone https://github.com/jiayushi1-ux/script-to-shot-engine.git \
 ---
 
 <div align="center">
-当前版本 <b>v7.0.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
+当前版本 <b>v7.1.0</b> · 只做万相 3.0 —— 一套渲染器、一套规则
 </div>

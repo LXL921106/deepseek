@@ -203,12 +203,15 @@ def sc07():
                     'references/dialogue-scene-mode.md',
                     'templates/project/01-档案/项目档案.md'], [r'口型缓冲', r'情绪停顿']),
         'old_shot': (['references/timing.md'], [r'^分镜\d+（']),
-        # 「一轮只出一个单元」已废弃：它让"先分镜后装箱"根本没法发生
-        'one_unit': (['SKILL.md', 'references/timing.md'],
-                     [r'只输出 1 个单元', r'一次只输出', r'下一单元从', r'→ 第一个单元']),
-        # 旧格式残留：台账/接续必须用「单元」，不能再出现 Clip
-        'clip_ref': (['SKILL.md', 'references/timing.md'],
-                     [r'Clip ?\d+ ?镜头', r'跨 Clip']),
+        # 组数不许预设：它是先分镜、后按时长装箱装出来的
+        'one_unit': (['SKILL.md', 'references/timing.md', 'references/start.md',
+                      'references/rule-tiers.md'],
+                     [r'只输出 1 个组', r'一次只输出', r'下一组从', r'→ 第一个组',
+                      r'3—5 个组', r'3-5 个组']),
+        # 最老的格式名「Clip」不许回来（只认「组」）
+        'clip_ref': (['SKILL.md', 'references/timing.md', 'references/start.md',
+                      'references/group-format.md'],
+                     [r'[Cc]lip']),
         # 语速只许有一套数字。旧表（3／4／5.5）不许回到规范文件里
         'rate2': (['SKILL.md', 'references/timing.md', 'references/dialogue.md',
                     'references/dialogue-scene-mode.md',
