@@ -351,12 +351,50 @@ def sc13():
                else f'SKILL.md 步骤 5 漏了：{miss}')
 
 
+# 配额行的解析：`15 秒：… 5—8 镜，单镜 2—4 秒` / `30 秒 … 10—18 镜`
+_QUOTA = re.compile(r'(?P<cap>\d+)\s*秒[^。；\n]*?(?P<lo>\d+)\s*[—－~-]\s*(?P<hi>\d+)\s*镜(?P<rest>[^。；\n]*)')
+_SHOTLEN = re.compile(r'单镜\s*(?P<flo>\d+(?:\.\d+)?)\s*[—－~-]\s*(?P<fhi>\d+(?:\.\d+)?)\s*秒')
+
+# 没有写单镜时长时的隐含下限：一拍少于 1 秒就不是镜头，是闪帧
+DEFAULT_MIN_SHOT = 1.0
+
+
+def sc14():
+    """数值配额必须**算术上可能**。
+
+    教训：`15 秒：5—8 镜，单镜 2—4 秒` —— 8×2=16s、5×4=20s，两条都超过 15 秒上限。
+    这种冲突靠读是看不出来的，必须算。判据：**镜数上限 × 单镜下限 ≤ 单元上限**，
+    否则"镜数上限"永远达不到（写成配额就是骗人）。
+    """
+    files = ['SKILL.md', 'references/dialogue-scene-mode.md',
+             'references/action-choreography-rules.md', 'references/continuous-mode.md',
+             'references/wan-renderer.md']
+    bad, seen = [], []
+    for f in files:
+        p = os.path.join(ROOT, f)
+        if not os.path.isfile(p):
+            continue
+        for ln, line in enumerate(read(p).splitlines(), 1):
+            for m in _QUOTA.finditer(line):
+                cap = float(m.group('cap'))
+                hi = float(m.group('hi'))
+                sl = _SHOTLEN.search(m.group('rest'))
+                floor = float(sl.group('flo')) if sl else DEFAULT_MIN_SHOT
+                need = round(hi * floor, 2)
+                seen.append(f"{f}:{ln} {m.group(0).strip()[:44]}")
+                if need > cap + 1e-6:
+                    bad.append(f'{f}:{ln} 「{m.group(0).strip()[:40]}」→ {hi:g}镜 × {floor:g}秒 = '
+                               f'{need:g}s > {cap:g}s 上限，镜数上限达不到')
+    return rec('SC-14', not bad,
+               f'{len(seen)} 条数值配额，算术上都成立' if not bad else ' | '.join(bad[:4]))
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12, sc13):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12, sc13, sc14):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来
