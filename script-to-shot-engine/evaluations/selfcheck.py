@@ -488,16 +488,9 @@ def sc17():
 
 
 def sc18():
-    """`<Picture N>` 是**平台自动给参考图的名字**——交付物里不写它。
-
-    交付物只列**资产文件名**（`林秀兰围裙.png`），顺序＝上传顺序。
-    写 `<Picture N>` 是多余，还可能和平台实际编号对不上。
-
-    允许保留的：说明"平台会自动命名、交付物不用写"的句子（行内含「不用写」）。
-    禁止的：**拿它指代素材**（模板、示例、参考行）。
-    """
+    """交付物只列**资产文件名**（`林秀兰围裙.png`）——不写 `<Picture N>`。"""
     hit = []
-    # 旧格式夹具（01–04）与决策笔记是**按设计保留的历史件**，不参与本项（同 SC-17）。
+    # 旧格式夹具（01–04）与决策笔记是按设计保留的历史件，不参与本项（同 SC-17）。
     SKIP = ('.agents/', 'evaluations/cases/01-', 'evaluations/cases/02-',
             'evaluations/cases/03-', 'evaluations/cases/04-')
     for d in ('', 'references', 'templates'):
@@ -513,11 +506,11 @@ def sc18():
                 if any(rel.startswith(s) for s in SKIP):
                     continue
                 for ln, line in enumerate(read(os.path.join(dirpath, f)).split('\n'), 1):
-                    if '<Picture' in line and '不用写' not in line:
+                    if '<Picture' in line:
                         hit.append(f'{rel}:{ln}')
     return rec('SC-18', not hit,
-               '交付物与模板里不写 <Picture N>（只出现在"平台会自动命名"的说明里）' if not hit
-               else f'还在用 <Picture N> 指代素材：{hit[:6]}')
+               '交付物只列资产文件名，没有 <Picture N>' if not hit
+               else f'还在用 <Picture N>：{hit[:6]}')
 
 
 def main():
