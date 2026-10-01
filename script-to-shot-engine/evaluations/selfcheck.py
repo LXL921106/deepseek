@@ -316,12 +316,35 @@ def sc12():
                '模板里没有残留被禁的节奏写法' if not hit else f'仍在教写：{hit[:6]}')
 
 
+REQUIRED_FIELDS = ('场景', '出场人物', '空间坐标', '同人声明', '画面描述',
+                   '光影', '运镜', '构图', '声画同步', '台词同期', '台词', '停顿',
+                   '台词节奏', '本镜禁止', '强制约束')
+
+
+def sc13():
+    """入口文件 SKILL.md 的逐镜字段表，必须覆盖 §9 模板里的每一个字段。
+
+    教训（栽过两次）：§9 加了 `台词同期`／`停顿`，SKILL.md 没跟上；
+    再补 `台词节奏` 时 SKILL.md 又漏了。而 **SKILL.md 是新会话读的第一份文件**——
+    它列的字段就是模型会写的字段，漏一个就等于那格白加。
+    """
+    skill = read(os.path.join(ROOT, 'SKILL.md'))
+    m = re.search(r'时长计算.{0,4}（.*?）(.{0,900}?)完整模板见', skill, re.S)
+    if not m:
+        return rec('SC-13', False, '定位不到 SKILL.md 步骤 5 的字段表')
+    seg = m.group(1)
+    miss = [f for f in REQUIRED_FIELDS if f not in seg]
+    return rec('SC-13', not miss,
+               f'SKILL.md 步骤 5 覆盖全部 {len(REQUIRED_FIELDS)} 个逐镜字段' if not miss
+               else f'SKILL.md 步骤 5 漏了：{miss}')
+
+
 def main():
     ap = argparse.ArgumentParser(add_help=True)
     ap.add_argument('--json', action='store_true')
     a = ap.parse_args()
 
-    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12):
+    for fn in (sc01, sc02, sc03, sc04, sc05, sc06, sc07, sc08, sc09, sc10, sc11, sc12, sc13):
         try:
             fn()
         except Exception as e:  # 自查本身出错也要报出来

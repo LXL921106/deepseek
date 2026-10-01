@@ -77,6 +77,10 @@ python selfcheck.py
 
 **改完先跑 `selfcheck.py`（说法一致），再跑 `gate.py`（守卫还在咬）。**
 
+> ⚠️ **`cases/*/delivery.md` 不要照抄。** 它们是**历史产物**（按当时的规则写的）或**故意带缺陷的夹具**——
+> 里面还留着 `字字清晰`／`语速缓慢`／`85mm` 这类**现在已被禁**的写法，留着是为了固定守卫的行为，
+> **不是范例**。写作口径一律以 [`../references/wan-renderer.md`](../references/wan-renderer.md) 为准。
+
 ## 每次改规则后
 
 1. 跑 `python gate.py`，全绿。
