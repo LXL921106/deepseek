@@ -184,13 +184,13 @@ _HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什�
 def sc07():
     """过时措辞：全技能不该再有这些。讲历史/讲教训的行除外。"""
     # 规范文件全集（不含 examples／cases：那是历史产物，另有「不要照抄」警告）
-    SPEC = ['SKILL.md', 'references/constraints.md', 'references/setup.md',
-            'references/space.md', 'references/timing.md', 'references/shots.md',
-            'references/dialogue.md', 'references/output.md', 'references/gates.md',
-            'references/troubleshooting.md', 'references/dialogue-scene-mode.md',
-            'references/continuous-mode.md', 'references/action-choreography-rules.md',
-            'references/rule-tiers.md', 'references/pre-shot-checklist.md',
-            'references/asset-anchor-protocol.md',
+    SPEC = ['SKILL.md', 'references/group-format.md', 'references/constraints.md',
+            'references/setup.md', 'references/space.md', 'references/timing.md',
+            'references/shots.md', 'references/dialogue.md', 'references/output.md',
+            'references/gates.md', 'references/troubleshooting.md',
+            'references/dialogue-scene-mode.md', 'references/continuous-mode.md',
+            'references/action-choreography-rules.md', 'references/rule-tiers.md',
+            'references/pre-shot-checklist.md', 'references/asset-anchor-protocol.md',
             'templates/project/01-档案/项目档案.md']
     stale = {
         'anchor': (SPEC, [r'空间站位', r'在场人物']),

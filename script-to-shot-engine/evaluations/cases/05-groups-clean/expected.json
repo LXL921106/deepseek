@@ -1,0 +1,18 @@
+{
+  "case": "05-groups-clean",
+  "what": "**组格式（A 方案主干）**的正确交付必须零阻断 —— 用来证明 check_groups.py 不误报。",
+  "format": "group",
+  "planted_defects": [],
+  "derived_from": "真实的 组12（用户 6 组之一），按新规则修正：补全「参考」、资产名带状态、每句台词写「看向谁」、说话人切换处留 0.7s 反应空档。",
+  "must_fire": {
+    "check_groups.py": []
+  },
+  "must_not_fire": [
+    "FMT-01", "FMT-03", "CAM-04",
+    "TIM-06", "AUD-04",
+    "GRP-01", "GRP-02", "GRP-03", "GRP-04",
+    "DIA-16", "DIA-17",
+    "SHT-07", "SHT-08"
+  ],
+  "note": "对照：同一份内容按原来的写法（组12 原文）跑 check_groups.py 会咬出 8 条阻断。"
+}

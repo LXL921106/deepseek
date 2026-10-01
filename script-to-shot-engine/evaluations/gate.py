@@ -42,7 +42,22 @@ CHECKERS = {
     'check_timeline.py': ['--delivery', 'delivery.md'],
     'check_cast.py': ['--delivery', 'delivery.md'],
     'check_units.py': ['--delivery', 'delivery.md'],
+    'check_groups.py': ['--delivery', 'delivery.md'],
 }
+
+# 每种交付格式该跑哪些检查器。**不在表里的（check_dialogue）对所有格式都跑。**
+# 这样"格式 → 检查器"的映射只有一处，不用给每个案例手写 skip_checkers。
+FORMAT_CHECKERS = {
+    'unit': {'check_units.py', 'check_cast.py'},   # 旧的「单元」格式
+    'group': {'check_groups.py'},                  # A 方案主干「组」格式
+    'clip': set(),                                 # 旧 Clip 格式：只有 check_timeline
+}
+
+
+def applies(script, fmt):
+    if script == 'check_dialogue.py' or fmt is None:
+        return True
+    return script in FORMAT_CHECKERS.get(fmt, set())
 
 
 def run_checker(script, case_dir, verbose, exp=None):
@@ -96,9 +111,13 @@ def main():
         total += 1
         problems = []
         print(f'\n── {name} ── {exp.get("what","")}')
+        fmt = exp.get('format')
         for script in CHECKERS:
             if script in (exp.get('skip_checkers') or []):
                 print(f'   ⊘ {script}  本案例不适用（skip_checkers）')
+                continue
+            if not applies(script, fmt):
+                print(f'   ⊘ {script}  格式「{fmt}」不适用（FORMAT_CHECKERS）')
                 continue
             must = set(exp.get('must_fire', {}).get(script, []))
             mustnot = set(exp.get('must_not_fire', []))

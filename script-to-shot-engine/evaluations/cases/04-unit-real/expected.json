@@ -2,6 +2,7 @@
   "case": "04-unit-real",
   "what": "真实输入（微信 df9a4bd6…）：一份按简易版规范产出的单元 11。**时长算式与装箱本身是对的**——这张夹具用来固定住它，防止以后改坏。",
   "source": "实测 df9a4bd6e9c3a1e0573a3f495318c87e.mp4：15.104s；语音合计 7.82s（52%）；停顿 1.44/1.06/2.53s。成片里出现了两个阿萍（画左前景肩背 + 中景坐着的人）。",
+  "format": "unit",
   "planted_defects": [],
   "skip_checkers": ["check_timeline.py"],
   "must_fire": {

@@ -45,7 +45,17 @@
 | `AST-01` | 正文所有 `@引用` 必须在「美术资产对照卡」登记 | 集合比对 ｜ **待实现——尚无脚本，不要声称它被阻断** |
 | `AST-02` | 正文不得用 `图N`／`图片N` 指代人物（必须写人物名） | 正则 |
 | `FMT-01` | 交付物必须是「单元 N + 镜头 N \|」格式，或明确的旧格式；两者都不是即报错 | 格式守卫 |
-| `FMT-03` | 每个单元必须以 `单元 N` **单独一行打头** | 格式守卫 |
+| `FMT-03` | 每个组必须以 `组 N` **单独一行打头**（组格式，A 方案主干） | 格式守卫 |
+| `GRP-01` | **「参考：」必须覆盖本组所有出场的人与物**——起始、结束、每一镜里出现的人都要在清单里 | `check_groups.py` |
+| `GRP-02` | **资产名必须带状态**（`林秀兰围裙` 非 `林秀兰`） | `check_groups.py` |
+| `GRP-03` | **不使用首帧／尾帧**——本平台不支持 | `check_groups.py` |
+| `TIM-06` | 镜数＝声明；时间戳首尾相接；**总长＝声明秒数** | `check_groups.py` |
+| `AUD-04` | 声音轨的说话人必须在「参考」清单里 | `check_groups.py` |
+| `DIA-16` | **每句台词必须写「看向〈对象〉」**——否则对着空气说 | `check_groups.py` |
+| `DIA-17` | **说话人切换处必须留 ≥0.5s 空档**（含跨组）——那 0.5 秒是**反应拍** | `check_groups.py` |
+| `SHT-07` | 写了「对视」的镜，景别必须双人（单人镜拍不到对视） | 提示 |
+| `SHT-08` | 镜1 必须写明画面主体（否则 `起始` 段会泄漏成镜1 画面） | 提示 |
+| `GRP-04` | 跨组状态链：上一组「结束」的人 ∩ 本组「起始」的人 ≠ ∅ | 提示 |
 | `PRJ-01` | 项目档案中创作者已接受的值（如「开场用可见画面」「无背景音乐」）在交付物中被满足 | 值比对 ｜ **待实现——尚无脚本** |
 | `CNT-05` | 锚点清单＋人物初始位置齐备；角色名不重复、不出现未登记的人 | 解析＋集合比对 |
 | `CNT-06` | 每个镜头写「出场人物：…」，且必须是本单元「人物：」行登记过的角色 | 逐镜集合比对 |
@@ -156,8 +166,9 @@
 
 | 脚本 | 覆盖 | 线路 | 用法 |
 |---|---|---|---|
-| `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01`／`FMT-03` | **Wan 新格式（本线）** | `python check_units.py --delivery 交付物.md` |
-| `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01`／`FMT-03` | **Wan 新格式（本线）** | `python check_cast.py --delivery 交付物.md` |
+| `scripts/check_groups.py` | `GRP-01`–`GRP-04`、`TIM-06`、`AUD-04`、`DIA-16`／`DIA-17`、`SHT-07`／`SHT-08`、`FMT-01`／`FMT-03`、`CAM-04` | **组格式（A 方案主线）** | `python check_groups.py --delivery 交付物.md` |
+| `scripts/check_units.py` | `TIM-01`–`TIM-05`、`FMT-01`／`FMT-03` | **旧的「单元」格式（过渡期保留）** | `python check_units.py --delivery 交付物.md` |
+| `scripts/check_cast.py` | `CNT-05`–`CNT-09`、`FMT-01`／`FMT-03` | **旧的「单元」格式（过渡期保留）** | `python check_cast.py --delivery 交付物.md` |
 | `scripts/check_dialogue.py` | `DIA-01`–`DIA-05`、`AST-02` | **两条线通用** | `python check_dialogue.py --script 剧本.md --delivery 交付物.md [--ledger 台账.md]` |
 | `scripts/check_timeline.py` | `TIM-01`–`TIM-04` | **仅历史旧格式交付** | `python check_timeline.py --delivery 交付物.md [--clip-seconds 15]` |
 
