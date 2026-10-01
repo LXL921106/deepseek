@@ -356,10 +356,12 @@ def sc13():
     if not m:
         return rec('SC-13', False, '定位不到 SKILL.md 的「逐镜写」指引')
     line = m.group(0)
+    # 「重述字段表」= 列了一**串**字段。只提一两个词（例如标题格式里的 `运镜方式`）不算。
     dup = [f for f in REQUIRED_FIELDS if f in line]
-    if dup:
+    if len(dup) >= 4:
         return rec('SC-13', False,
-                   f'SKILL.md 又重述了逐镜字段 {dup[:5]}——应只指向 output.md §9，字段只有一个家')
+                   f'SKILL.md 又重述了逐镜字段 {dup[:6]}（共 {len(dup)} 个）——'
+                   f'应只指向 output.md §9，字段只有一个家')
     ok = 'output.md' in line and '不重述' in line
     return rec('SC-13', ok,
                'SKILL.md 只指向 output.md §9，不重述逐镜字段' if ok
