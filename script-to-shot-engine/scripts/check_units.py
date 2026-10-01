@@ -47,6 +47,7 @@ _BUF_PARTS = re.compile(r'缓冲\s*([\d.]+)\s*s?\s*[（(]\s*标点停顿\s*([\d.
 _REACT = re.compile(r'反应(?:镜头)?\s*([\d.]+)\s*s')
 _ACTION = re.compile(r'动作步长\s*([\d.]+)\s*s')
 _EMO = re.compile(r'情绪\s*([\d.]+)\s*s')
+_MM = re.compile(r'(?<![\d.])\d{2,3}\s*mm(?![\w])')
 
 MIN_S, MAX_S = 6.0, 15.0
 
@@ -119,11 +120,20 @@ def parse(text):
             act = _ACTION.search(sh['raw'])
             if act:
                 sh['action'] = float(act.group(1))
-    return units, has_unit, has_clip
+    return units, has_unit, has_clip, text
 
 
-def check(units, has_unit=True, has_clip=False):
+def check(units, has_unit=True, has_clip=False, raw=''):
     blockers, warnings, info = [], [], []
+
+    # CAM-04 提示词里不得出现焦距（mm）。
+    # 「角色定位」写了「精通 ARRI/RED/Sony 全系列摄影机技术特性」——这会让模型想写机型与参数。
+    # 而实测「近景＋85mm」会被执行成中远景（把不该入画的人也拍进来）。**摄影机的功力用在决定画面，不写在参数上。**
+    mm = _MM.findall(raw)
+    if mm:
+        blockers.append({'id': 'CAM-04',
+                         'msg': f'提示词里出现了焦距 {sorted(set(mm))}——`CAM-01` 要求只写景别，'
+                                f'不写 mm（实测「近景＋85mm」被执行成中远景）'})
 
     # FMT-01/02 格式守卫：不认识就报错，不要静默通过
     # （实测教训：check_timeline 曾因找不到 `### Clip NN` 而一个分镜都没读到，把漏了 6 秒的提示词判成通过）
