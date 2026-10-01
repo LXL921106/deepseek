@@ -178,7 +178,7 @@ def sc06():
                f'{len(names)} 个夹具，expected/must_fire 全部自洽' if not bad else ' | '.join(bad[:6]))
 
 
-_HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什么', '教训', '旧写法')
+_HISTORY = ('实测', '不再写', '已废弃', '旧格式', '迁移', '为什么', '教训', '旧写法', '不加', '不要')
 
 
 def sc07():
@@ -192,6 +192,11 @@ def sc07():
         'anchor': (SPEC, [r'空间站位', r'在场人物']),
         'focal': (SPEC, [r'85mm', r'135mm', r'焦段']),
         'density': (SPEC, [r'信息密度配额']),
+        # 台词字数不单列（字数只出现在「时长计算」的算式里）
+        'charfield': (SPEC, [r'台词字数约']),
+        # 旧的加数名（现统一叫「表演与停顿」）
+        'oldadd': (['SKILL.md', 'references/wan-renderer.md', 'references/dialogue-scene-mode.md',
+                    'templates/project/01-档案/项目档案.md'], [r'口型缓冲', r'情绪停顿']),
         'old_shot': (['references/wan-renderer.md'], [r'^分镜\d+（']),
         # 「一轮只出一个单元」已废弃：它让"先分镜后装箱"根本没法发生
         'one_unit': (['SKILL.md', 'references/wan-renderer.md'],
